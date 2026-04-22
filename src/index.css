@@ -1,5 +1,5 @@
 html, body, #root { margin: 0; padding: 0; height: 100%; }
-body { background: #0a0e27; }
+body { background: #121212; }
 * { box-sizing: border-box; }
 
 .studio-btn {
@@ -7,7 +7,14 @@ body { background: #0a0e27; }
 }
 .studio-btn:hover { filter: brightness(1.15); }
 .studio-btn:active { transform: translateY(1px); }
-.studio-btn-ghost:hover { filter: none; background: var(--hover-bg, rgba(0,208,132,0.12)) !important; }
+.studio-btn-ghost:hover { filter: none; background: var(--hover-bg, rgba(255,122,26,0.14)) !important; }
+.studio-btn:focus-visible { outline: 2px solid var(--focus, #ff7a1a); outline-offset: 2px; }
 
 .cm-editor { height: 100%; }
 .cm-editor .cm-scroller { font-family: 'Fira Code', 'Courier New', ui-monospace, monospace; }
+
+/* Thin, themeable scrollbars */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.35); border-radius: 6px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.55); }
