@@ -13,8 +13,29 @@ body { background: #121212; }
 .cm-editor { height: 100%; }
 .cm-editor .cm-scroller { font-family: 'Fira Code', 'Courier New', ui-monospace, monospace; }
 
+/* Splitter between editor and canvas panel. */
+.studio-splitter { transition: background 0.15s ease; }
+.studio-splitter:hover, .studio-splitter:active {
+  background: rgba(255, 122, 26, 0.65) !important;
+}
+
+/* IDE-style tabs above the editor. */
+.studio-tab { transition: background 0.12s ease, color 0.12s ease; }
+.studio-tab:hover { background: var(--hover-bg, rgba(255, 122, 26, 0.1)) !important; }
+.studio-tab-close {
+  opacity: 0.55;
+  transition: opacity 0.12s ease, background 0.12s ease;
+}
+.studio-tab-close:hover {
+  opacity: 1;
+  background: rgba(255, 122, 26, 0.18);
+}
+
 /* Thin, themeable scrollbars */
 *::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.35); border-radius: 6px; }
 *::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.55); }
+
+/* Tab bar scrollbar — even thinner. */
+.studio-tabbar::-webkit-scrollbar { height: 4px; }
