@@ -1,5 +1,8 @@
-// Numbered course structure.
+// Numbered course structure. The `playground` module is a single blank sketch
+// where learners can experiment freely — keep it as its own module so the
+// numbered lesson sequence stays stable.
 export const modules = [
+  { id: 'm0', sectionIds: ['playground'] },
   { id: 'm1', sectionIds: ['intro', 'fundamentals', 'colors'] },
   { id: 'm2', sectionIds: ['variables', 'conditionals', 'loops', 'functions'] },
   { id: 'm3', sectionIds: ['interaction', 'keyboard'] },
@@ -8,23 +11,43 @@ export const modules = [
   { id: 'm6', sectionIds: ['text', 'gradient'] }
 ];
 
-// Return "2.3" style number for a section id.
+// Return "2.3" style number for a lesson section, or empty string for the
+// playground (it isn't part of the numbered curriculum).
 export function sectionNumber(id) {
   for (let mi = 0; mi < modules.length; mi++) {
+    if (modules[mi].id === 'm0') continue;
     const idx = modules[mi].sectionIds.indexOf(id);
-    if (idx !== -1) return `${mi + 1}.${idx + 1}`;
+    if (idx !== -1) return `${mi}.${idx + 1}`;
   }
   return '';
 }
 
+export function moduleNumber(id) {
+  const i = modules.findIndex(m => m.id === id);
+  return i <= 0 ? '' : String(i);
+}
+
+const SHARED = {
+  brand: 'YTÜ Programlama',
+  repoLabel: 'GitHub',
+  downloadLabel: '⬇',
+  uploadLabel: '⬆'
+};
+
 export const translations = {
   en: {
+    ...SHARED,
     title: 'Processing.js Studio',
-    subtitle: 'A hands-on course in creative coding',
+    subtitle: 'A hands-on course in creative coding · YTÜ Programlama',
+    about: 'Made for YTÜ Programlama — a hands-on introduction to creative coding with Processing.',
     editor: 'CODE EDITOR',
     editorSub: 'Processing / Java',
     run: '▶ Run',
     reset: '↻ Reset',
+    download: 'Download sketch',
+    upload: 'Open .pde file',
+    share: 'Share',
+    shareCopied: 'Link copied',
     langLabel: 'Language',
     themeLabel: 'Theme',
     themeDark: 'Dark',
@@ -34,7 +57,9 @@ export const translations = {
     lessonIntro: 'Overview',
     lessonConcepts: 'Key concepts',
     lessonTryIt: 'Try it yourself',
+    playgroundBadge: 'SANDBOX',
     modules: {
+      m0: 'Playground',
       m1: 'Foundations',
       m2: 'Logic & Control Flow',
       m3: 'User Input',
@@ -43,6 +68,7 @@ export const translations = {
       m6: 'Typography & Color'
     },
     sections: {
+      playground: 'Blank Sketch',
       intro: 'Your First Sketch',
       fundamentals: 'Basic Shapes',
       colors: 'Colors & Style',
@@ -63,6 +89,17 @@ export const translations = {
       gradient: 'Gradients'
     },
     lessons: {
+      playground: {
+        intro: 'A blank sketch. Write any Processing code here — the editor transpiles Processing (Java-flavored) to p5.js on the fly, so most sketches from the Processing examples will run. Use this tab to experiment with your own ideas, paste homework, or try things outside the lessons.',
+        concepts: [
+          'Both void setup() and function setup() are accepted.',
+          'Java types (int, float, String, boolean, color, PVector) are supported as declarations and parameters.',
+          'Classes with Java-style constructors are transpiled to JS classes.',
+          'println() and print() are aliased to console.log().',
+          'Use size(w, h) in setup() — it becomes createCanvas(w, h) under the hood.'
+        ],
+        tryIt: 'Paste a sketch from a Processing tutorial and press Run. If something fails to run, simplify until it does — the transpiler covers the common beginner subset.'
+      },
       intro: {
         intro: 'A Processing sketch is built from two special functions: setup() runs exactly once when the program starts, and draw() runs continuously — roughly 60 times per second. Everything visual happens inside them. The pixel grid places (0,0) at the top-left and increases to the right and down.',
         concepts: [
@@ -248,12 +285,18 @@ export const translations = {
   },
 
   tr: {
+    ...SHARED,
     title: 'Processing.js Stüdyosu',
-    subtitle: 'Yaratıcı kodlama için uygulamalı kurs',
+    subtitle: 'Yaratıcı kodlama için uygulamalı kurs · YTÜ Programlama',
+    about: 'YTÜ Programlama için hazırlandı — Processing ile yaratıcı kodlamaya uygulamalı giriş.',
     editor: 'KOD EDİTÖRÜ',
     editorSub: 'Processing / Java',
     run: '▶ Çalıştır',
     reset: '↻ Sıfırla',
+    download: 'Çizimi indir',
+    upload: '.pde dosyası aç',
+    share: 'Paylaş',
+    shareCopied: 'Bağlantı kopyalandı',
     langLabel: 'Dil',
     themeLabel: 'Tema',
     themeDark: 'Koyu',
@@ -263,7 +306,9 @@ export const translations = {
     lessonIntro: 'Genel Bakış',
     lessonConcepts: 'Anahtar Kavramlar',
     lessonTryIt: 'Kendiniz Deneyin',
+    playgroundBadge: 'DENEME ALANI',
     modules: {
+      m0: 'Deneme Alanı',
       m1: 'Temeller',
       m2: 'Mantık ve Akış Kontrolü',
       m3: 'Kullanıcı Girişi',
@@ -272,6 +317,7 @@ export const translations = {
       m6: 'Tipografi ve Renk'
     },
     sections: {
+      playground: 'Boş Çizim',
       intro: 'İlk Çiziminiz',
       fundamentals: 'Temel Şekiller',
       colors: 'Renkler ve Stil',
@@ -292,6 +338,17 @@ export const translations = {
       gradient: 'Gradyanlar'
     },
     lessons: {
+      playground: {
+        intro: 'Boş bir çizim alanı. İstediğiniz Processing kodunu buraya yazın — editör Processing (Java tadında) kodunu anında p5.js\'e çevirir, bu yüzden Processing örneklerinin büyük kısmı doğrudan çalışır. Bu sekmeyi kendi fikirlerinizi denemek, ödev yapıştırmak veya derslerin dışına çıkmak için kullanın.',
+        concepts: [
+          'Hem void setup() hem function setup() kabul edilir.',
+          'Java tipleri (int, float, String, boolean, color, PVector) değişken ve parametre tanımlarında desteklenir.',
+          'Java tarzı yapıcılara sahip sınıflar JS sınıflarına çevrilir.',
+          'println() ve print(), console.log()\'a yönlendirilir.',
+          'setup() içinde size(g, y) kullanın — arka planda createCanvas(g, y)\'ye dönüşür.'
+        ],
+        tryIt: 'Bir Processing eğitiminden bir çizim yapıştırın ve Çalıştır\'a basın. Çalışmazsa sadeleştirerek hata ayıklayın — transpiler başlangıç düzeyindeki çoğu özelliği kapsar.'
+      },
       intro: {
         intro: 'Bir Processing çizimi iki özel fonksiyondan oluşur: setup() program başladığında bir kez çalışır, draw() ise sürekli — yaklaşık saniyede 60 kez — çalışır. Tüm görsel işler bunların içinde olur. Piksel ızgarasında (0,0) sol üstte yer alır; x sağa, y aşağı doğru artar.',
         concepts: [
@@ -477,12 +534,18 @@ export const translations = {
   },
 
   de: {
+    ...SHARED,
     title: 'Processing.js Studio',
-    subtitle: 'Ein praktischer Kurs für kreatives Coden',
+    subtitle: 'Ein praktischer Kurs für kreatives Coden · YTÜ Programlama',
+    about: 'Erstellt für YTÜ Programlama — eine praktische Einführung ins kreative Coden mit Processing.',
     editor: 'CODE-EDITOR',
     editorSub: 'Processing / Java',
     run: '▶ Ausführen',
     reset: '↻ Zurücksetzen',
+    download: 'Skizze herunterladen',
+    upload: '.pde-Datei öffnen',
+    share: 'Teilen',
+    shareCopied: 'Link kopiert',
     langLabel: 'Sprache',
     themeLabel: 'Thema',
     themeDark: 'Dunkel',
@@ -492,7 +555,9 @@ export const translations = {
     lessonIntro: 'Überblick',
     lessonConcepts: 'Kernkonzepte',
     lessonTryIt: 'Selbst ausprobieren',
+    playgroundBadge: 'SANDBOX',
     modules: {
+      m0: 'Spielwiese',
       m1: 'Grundlagen',
       m2: 'Logik & Kontrollfluss',
       m3: 'Benutzereingabe',
@@ -501,6 +566,7 @@ export const translations = {
       m6: 'Typografie & Farbe'
     },
     sections: {
+      playground: 'Leere Skizze',
       intro: 'Deine erste Skizze',
       fundamentals: 'Grundformen',
       colors: 'Farben & Stil',
@@ -521,6 +587,17 @@ export const translations = {
       gradient: 'Farbverläufe'
     },
     lessons: {
+      playground: {
+        intro: 'Eine leere Skizze. Schreibe hier beliebigen Processing-Code — der Editor transpiliert Processing (Java-artig) on the fly zu p5.js, sodass die meisten Beispiele aus Processing direkt laufen. Nutze diese Registerkarte zum Experimentieren, für Hausaufgaben oder Ideen außerhalb der Lektionen.',
+        concepts: [
+          'Sowohl void setup() als auch function setup() werden akzeptiert.',
+          'Java-Typen (int, float, String, boolean, color, PVector) werden bei Variablen und Parametern unterstützt.',
+          'Klassen mit Java-Konstruktoren werden in JS-Klassen übersetzt.',
+          'println() und print() verweisen auf console.log().',
+          'Verwende size(b, h) in setup() — es wird intern zu createCanvas(b, h).'
+        ],
+        tryIt: 'Füge eine Skizze aus einem Processing-Tutorial ein und drücke Ausführen. Falls sie nicht läuft, vereinfache sie — der Transpiler deckt das gängige Anfängerrepertoire ab.'
+      },
       intro: {
         intro: 'Eine Processing-Skizze basiert auf zwei besonderen Funktionen: setup() läuft einmal beim Start, draw() läuft dauerhaft — etwa 60-mal pro Sekunde. Alles Visuelle passiert darin. Im Pixelraster liegt (0,0) oben links; x wächst nach rechts, y nach unten.',
         concepts: [
