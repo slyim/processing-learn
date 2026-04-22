@@ -1,0 +1,40 @@
+export const themes = {
+  dark: {
+    bg: '#0a0e27',
+    panel: '#141933',
+    panelAlt: 'rgba(20, 24, 50, 0.9)',
+    headerGrad: 'linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%)',
+    border: 'rgba(255, 255, 255, 0.08)',
+    text: '#e0e0e0',
+    textMuted: '#b0b0c0',
+    textDim: '#888',
+    accent: '#00d084',
+    accentSoft: 'rgba(0, 208, 132, 0.15)',
+    accent2: '#ff006e',
+    accent2Soft: 'rgba(255, 0, 110, 0.12)',
+    editorBg: '#0a0e27',
+    canvasBg: '#000',
+    buttonBg: '#00d084',
+    buttonText: '#0a0e27',
+    shadow: '0 12px 40px rgba(0, 0, 0, 0.8)'
+  },
+  light: {
+    bg: '#f4f6fb',
+    panel: '#ffffff',
+    panelAlt: '#ffffff',
+    headerGrad: 'linear-gradient(135deg, #ffffff 0%, #eef1f9 100%)',
+    border: 'rgba(20, 24, 50, 0.12)',
+    text: '#1a1f3a',
+    textMuted: '#55607a',
+    textDim: '#8a93a8',
+    accent: '#008a56',
+    accentSoft: 'rgba(0, 138, 86, 0.1)',
+    accent2: '#c70059',
+    accent2Soft: 'rgba(199, 0, 89, 0.08)',
+    editorBg: '#ffffff',
+    canvasBg: '#eef1f9',
+    buttonBg: '#008a56',
+    buttonText: '#ffffff',
+    shadow: '0 6px 20px rgba(20, 24, 50, 0.12)'
+  }
+};

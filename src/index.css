@@ -1,0 +1,13 @@
+html, body, #root { margin: 0; padding: 0; height: 100%; }
+body { background: #0a0e27; }
+* { box-sizing: border-box; }
+
+.studio-btn {
+  transition: filter 0.15s ease, transform 0.1s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.studio-btn:hover { filter: brightness(1.15); }
+.studio-btn:active { transform: translateY(1px); }
+.studio-btn-ghost:hover { filter: none; background: var(--hover-bg, rgba(0,208,132,0.12)) !important; }
+
+.cm-editor { height: 100%; }
+.cm-editor .cm-scroller { font-family: 'Fira Code', 'Courier New', ui-monospace, monospace; }
