@@ -4,6 +4,12 @@ A browser-based studio for learning [Processing](https://processing.org/) throug
 
 Written for students of **YTÜ Programlama** (Yıldız Teknik Üniversitesi), available in Turkish, English, and German.
 
+<p align="center">
+  <a href="https://slyim.github.io/processing-learn/">
+    <img src="https://img.shields.io/badge/%E2%96%B6%20Open%20the%20Studio-ff7a1a?style=for-the-badge&labelColor=1a1a1a" alt="Open the Studio" height="44" />
+  </a>
+</p>
+
 > 🇹🇷 [Türkçe sürüm aşağıda](#türkçe).
 
 ![Stack](https://img.shields.io/badge/Vite-8-646cff) ![React](https://img.shields.io/badge/React-19-61dafb) ![p5.js](https://img.shields.io/badge/p5.js-1.7-ed225d)
@@ -100,6 +106,12 @@ That's it — the sidebar, numbering, and lesson panel pick it up automatically.
 **Processing.js Stüdyosu**, tarayıcıda çalışan bir Processing öğrenme ortamıdır. Dersler canlı bir kod editörü ve çizim alanıyla yan yana çalışır — kodu değiştirirsiniz, sonucu anında görürsünüz.
 
 Yıldız Teknik Üniversitesi **YTÜ Programlama** öğrencileri için hazırlanmıştır. Türkçe, İngilizce ve Almanca desteklenir.
+
+<p align="center">
+  <a href="https://slyim.github.io/processing-learn/">
+    <img src="https://img.shields.io/badge/%E2%96%B6%20Stüdyoyu%20Aç-ff7a1a?style=for-the-badge&labelColor=1a1a1a" alt="Stüdyoyu Aç" height="44" />
+  </a>
+</p>
 
 ## Özellikler
 
