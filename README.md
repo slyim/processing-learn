@@ -8,6 +8,10 @@ Written for students of **YTÜ Programlama** (Yıldız Teknik Üniversitesi), av
   <a href="https://slyim.github.io/processing-learn/">
     <img src="https://img.shields.io/badge/%E2%96%B6%20Open%20the%20Studio-ff7a1a?style=for-the-badge&labelColor=1a1a1a" alt="Open the Studio" height="44" />
   </a>
+  &nbsp;
+  <a href="https://github.com/slyim/processing-learn">
+    <img src="https://img.shields.io/badge/View%20on%20GitHub-1a1a1a?style=for-the-badge&logo=github&logoColor=ff7a1a" alt="View on GitHub" height="44" />
+  </a>
 </p>
 
 > 🇹🇷 [Türkçe sürüm aşağıda](#türkçe).
@@ -110,6 +114,10 @@ Yıldız Teknik Üniversitesi **YTÜ Programlama** öğrencileri için hazırlan
 <p align="center">
   <a href="https://slyim.github.io/processing-learn/">
     <img src="https://img.shields.io/badge/%E2%96%B6%20Stüdyoyu%20Aç-ff7a1a?style=for-the-badge&labelColor=1a1a1a" alt="Stüdyoyu Aç" height="44" />
+  </a>
+  &nbsp;
+  <a href="https://github.com/slyim/processing-learn">
+    <img src="https://img.shields.io/badge/GitHub'da%20Gör-1a1a1a?style=for-the-badge&logo=github&logoColor=ff7a1a" alt="GitHub'da Gör" height="44" />
   </a>
 </p>
 
