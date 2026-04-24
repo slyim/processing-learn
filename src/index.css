@@ -1,41 +1,52 @@
 html, body, #root { margin: 0; padding: 0; height: 100%; }
-body { background: #121212; }
+body {
+  background: #0c0c0f;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 * { box-sizing: border-box; }
 
-.studio-btn {
-  transition: filter 0.15s ease, transform 0.1s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-.studio-btn:hover { filter: brightness(1.15); }
-.studio-btn:active { transform: translateY(1px); }
-.studio-btn-ghost:hover { filter: none; background: var(--hover-bg, rgba(255,122,26,0.14)) !important; }
-.studio-btn:focus-visible { outline: 2px solid var(--focus, #ff7a1a); outline-offset: 2px; }
+::selection { background: rgba(249, 115, 22, 0.25); }
 
-.cm-editor { height: 100%; }
-.cm-editor .cm-scroller { font-family: 'Fira Code', 'Courier New', ui-monospace, monospace; }
-
-/* Splitter between editor and canvas panel. */
-.studio-splitter { transition: background 0.15s ease; }
-.studio-splitter:hover, .studio-splitter:active {
-  background: rgba(255, 122, 26, 0.65) !important;
-}
-
-/* IDE-style tabs above the editor. */
-.studio-tab { transition: background 0.12s ease, color 0.12s ease; }
-.studio-tab:hover { background: var(--hover-bg, rgba(255, 122, 26, 0.1)) !important; }
-.studio-tab-close {
-  opacity: 0.55;
-  transition: opacity 0.12s ease, background 0.12s ease;
-}
-.studio-tab-close:hover {
-  opacity: 1;
-  background: rgba(255, 122, 26, 0.18);
-}
-
-/* Thin, themeable scrollbars */
-*::-webkit-scrollbar { width: 10px; height: 10px; }
+/* Scrollbars */
+*::-webkit-scrollbar { width: 8px; height: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.35); border-radius: 6px; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.55); }
+*::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.30); border-radius: 99px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.50); }
 
-/* Tab bar scrollbar — even thinner. */
-.studio-tabbar::-webkit-scrollbar { height: 4px; }
+/* Sidebar items — hover shade uses --hover-bg set on the element */
+.sb-item { transition: background 0.15s ease; }
+.sb-item:hover:not([data-active]) { background: var(--hover-bg, rgba(249,115,22,0.08)) !important; }
+
+.sb-iconbtn { transition: color 0.15s ease, background 0.15s ease; }
+.sb-iconbtn:hover { color: var(--hover-color) !important; }
+
+/* Editor tabs */
+.editor-tab { transition: background 0.12s ease; }
+.editor-tab:hover:not([data-active]) { background: var(--hover-bg) !important; }
+.editor-tab-close:hover { opacity: 1 !important; background: rgba(249, 115, 22, 0.18); }
+.editor-tab-new:hover { color: var(--hover-color, #e3e1dc); }
+
+/* Action buttons */
+.btn-run:hover { filter: brightness(1.08); }
+.btn-run:active { transform: translateY(1px); }
+.btn-ghost:hover { border-color: var(--hover-border) !important; }
+.btn-icon:hover { color: var(--hover-color) !important; border-color: var(--hover-border) !important; }
+
+/* Resize handle highlight on hover */
+.resize-handle:hover { background: var(--hover-bg) !important; }
+
+/* File row action buttons (rename/delete) — hidden until you hover the row */
+.file-row-action { opacity: 0; transition: opacity 0.15s ease, color 0.15s ease; }
+.sb-item:hover .file-row-action,
+.file-row-action:focus-visible { opacity: 1; }
+
+/* Status dot button — subtle focus ring so keyboard users know it's actionable */
+.status-dot-btn { transition: transform 0.12s ease, background 0.12s ease; }
+.status-dot-btn:hover { background: var(--hover-bg, rgba(249,115,22,0.12)); }
+.status-dot-btn:focus-visible { outline: 2px solid var(--focus-ring, #f97316); outline-offset: 2px; }
+
+/* CodeMirror — make the scroller fill its container */
+.cm-editor { height: 100%; }
+.cm-editor .cm-scroller { font-family: 'JetBrains Mono', ui-monospace, monospace; }

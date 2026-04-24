@@ -58,6 +58,10 @@ export const translations = {
     lessonConcepts: 'Key concepts',
     lessonTryIt: 'Try it yourself',
     playgroundBadge: 'SANDBOX',
+    tabCourses: 'Courses',
+    tabFiles: 'Files',
+    lessonOverview: 'LESSON OVERVIEW',
+    running: 'Running…',
     modules: {
       m0: 'Playground',
       m1: 'Foundations',
@@ -307,6 +311,10 @@ export const translations = {
     lessonConcepts: 'Anahtar Kavramlar',
     lessonTryIt: 'Kendiniz Deneyin',
     playgroundBadge: 'DENEME ALANI',
+    tabCourses: 'Dersler',
+    tabFiles: 'Dosyalar',
+    lessonOverview: 'DERS ÖZETİ',
+    running: 'Çalışıyor…',
     modules: {
       m0: 'Deneme Alanı',
       m1: 'Temeller',
@@ -556,6 +564,10 @@ export const translations = {
     lessonConcepts: 'Kernkonzepte',
     lessonTryIt: 'Selbst ausprobieren',
     playgroundBadge: 'SANDBOX',
+    tabCourses: 'Kurse',
+    tabFiles: 'Dateien',
+    lessonOverview: 'LEKTIONSÜBERSICHT',
+    running: 'Läuft…',
     modules: {
       m0: 'Spielwiese',
       m1: 'Grundlagen',
