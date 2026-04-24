@@ -169,3 +169,53 @@ export default function Icon({ name, size = 16, title, style, onClick, strokeWid
     </svg>
   );
 }
+
+// Branded blue "P" tile — matches the look of the Processing (.pde) file icon
+// used by the Processing IDE. Rendered as an SVG so it scales cleanly alongside
+// the Eva icons. The color is hard-coded to Processing's signature blue so it
+// reads as "this is a Processing file" regardless of the app theme.
+export function PdeIcon({ size = 14, title }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      aria-hidden={title ? undefined : true}
+      aria-label={title}
+      role={title ? 'img' : undefined}
+      style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}
+    >
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#006699" />
+      <text
+        x="12" y="17"
+        textAnchor="middle"
+        fontSize="16"
+        fontWeight="900"
+        fontFamily="Inter, sans-serif"
+        fill="#ffffff"
+      >P</text>
+    </svg>
+  );
+}
+
+// Stacked "data" folder — same silhouette as the regular folder but with a
+// couple of horizontal lines to suggest a dataset. Used when a folder is
+// named "data", matching Processing's convention for sketch assets.
+export function DataFolderIcon({ size = 14, title, color = 'currentColor' }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={color}
+      aria-hidden={title ? undefined : true}
+      aria-label={title}
+      role={title ? 'img' : undefined}
+      style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}
+    >
+      <path d="M19.5,20.5H4.5A2.47,2.47,0,0,1,2,18.07V5.93A2.47,2.47,0,0,1,4.5,3.5H9.1a1,1,0,0,1,.77.37l2.6,3.18h7A2.47,2.47,0,0,1,22,9.48v8.59A2.47,2.47,0,0,1,19.5,20.5ZM4,13.76v4.31a.46.46,0,0,0,.5.43h15a.46.46,0,0,0,.5-.43V9.48a.46.46,0,0,0-.5-.43H12a1,1,0,0,1-.77-.37L8.63,5.5H4.5a.46.46,0,0,0-.5.43Z" />
+      <rect x="7" y="12" width="10" height="1.4" rx="0.7" fill="#ffffff" opacity="0.85" />
+      <rect x="7" y="14.7" width="7" height="1.4" rx="0.7" fill="#ffffff" opacity="0.65" />
+    </svg>
+  );
+}

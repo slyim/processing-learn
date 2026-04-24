@@ -152,7 +152,7 @@ function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, c
   );
 }
 
-export default function RightPanel({ t, c, canvasRef, lesson, sectionNum, sectionTitle, moduleLabel, overviewCollapsed, setOverviewCollapsed }) {
+export default function RightPanel({ t, c, canvasRef, lesson, sectionNum, sectionTitle, moduleLabel, overviewCollapsed, setOverviewCollapsed, showOverview = true }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column',
@@ -162,15 +162,17 @@ export default function RightPanel({ t, c, canvasRef, lesson, sectionNum, sectio
       overflow: 'hidden'
     }}>
       <CanvasPreview c={c} canvasRef={canvasRef} sectionNum={sectionNum} />
-      <CourseOverview
-        t={t} c={c}
-        lesson={lesson}
-        sectionNum={sectionNum}
-        sectionTitle={sectionTitle}
-        moduleLabel={moduleLabel}
-        collapsed={overviewCollapsed}
-        setCollapsed={setOverviewCollapsed}
-      />
+      {showOverview && (
+        <CourseOverview
+          t={t} c={c}
+          lesson={lesson}
+          sectionNum={sectionNum}
+          sectionTitle={sectionTitle}
+          moduleLabel={moduleLabel}
+          collapsed={overviewCollapsed}
+          setCollapsed={setOverviewCollapsed}
+        />
+      )}
     </div>
   );
 }

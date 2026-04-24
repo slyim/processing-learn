@@ -3,6 +3,7 @@ import { sketches, sectionIds } from './sketches';
 import { translations, modules } from './i18n';
 import { transpile, P5_HOOKS } from './transpile';
 import { themes } from './theme';
+import { displayFileName } from './lib/fileNames';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import CodeEditor from './components/CodeEditor';
@@ -138,7 +139,7 @@ export default function ProcessingStudio() {
     for (const id of initial.ids) b[id] = initialCodeFor(id, initialNodes);
     return b;
   });
-  const [sidebarW, setSidebarW] = useState(() => loadNum(SIDEBAR_W_KEY, 240, 180, 380));
+  const [sidebarW, setSidebarW] = useState(() => loadNum(SIDEBAR_W_KEY, 240, 210, 380));
   const [rightW, setRightW] = useState(() => loadNum(RIGHT_W_KEY, 360, 260, 540));
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => loadBool(SIDEBAR_COLLAPSED_KEY, false));
   const [overviewCollapsed, setOverviewCollapsed] = useState(() => loadBool(OVERVIEW_COLLAPSED_KEY, false));
@@ -275,10 +276,38 @@ export default function ProcessingStudio() {
   // no window.prompt() / confirm() because Electron's chrome doesn't
   // implement them and they throw "not supported". The Sidebar collects
   // input via an <input> element instead.
+  //
+  // type === 'sketch' is a convenience action that mirrors how the real
+  // Processing IDE stores sketches: a folder + a .pde file inside sharing the
+  // folder's name. Creating one in a single click is the expected UX and also
+  // makes room for a `data/` subfolder per Processing conventions.
   const createUserNode = useCallback((parentId, type, rawName) => {
     const name = (rawName || '').trim();
     if (!name) return;
     const parent = parentId || 'root';
+
+    if (type === 'sketch') {
+      // Strip .pde if the user typed one — the sketch name is the folder name,
+      // and we'll append .pde to the main file automatically.
+      const cleanName = name.replace(/\.pde$/i, '').trim();
+      if (!cleanName) return;
+      const folderName = nextUserName(userNodes, parent, cleanName);
+      const folderId = makeId('ufd');
+      const fileId = makeId('uf');
+      const fileName = `${folderName}.pde`;
+      setUserNodes(prev => ({
+        ...prev,
+        [folderId]: { id: folderId, type: 'folder', name: folderName, parentId: parent },
+        [fileId]: { id: fileId, type: 'file', name: fileName, parentId: folderId, content: BLANK_SKETCH }
+      }));
+      setBuffers(prev => ({ ...prev, [fileId]: BLANK_SKETCH }));
+      setTabs(prev => ({
+        ids: prev.ids.includes(fileId) ? prev.ids : [...prev.ids, fileId],
+        active: fileId
+      }));
+      return;
+    }
+
     const desired = type === 'file' && !/\.[a-z0-9]+$/i.test(name)
       ? `${name}.pde`
       : name;
@@ -383,14 +412,47 @@ export default function ProcessingStudio() {
     const node = userNodes[id];
     if (!node) return;
     const name = (rawName || '').trim();
-    if (!name || name === node.name) return;
+    if (!name) return;
+    // If we stripped .pde for display, put it back on save so on-disk naming
+    // stays canonical. Only do this for existing .pde files so the user can
+    // still rename a file to a different extension (e.g. "notes.txt").
+    const desired = node.type === 'file' && /\.pde$/i.test(node.name) && !/\.[a-z0-9]+$/i.test(name)
+      ? `${name}.pde`
+      : name;
+    if (desired === node.name) return;
     const finalName = nextUserName(
       Object.fromEntries(Object.entries(userNodes).filter(([k]) => k !== id)),
-      node.parentId, name
+      node.parentId, desired
     );
+
+    // Sketch-folder convention: if you rename a folder, any child .pde that
+    // shared the folder's old name should follow along. This keeps the
+    // Processing "folder == sketch" identity intact.
+    let extraUpdates = {};
+    if (node.type === 'folder') {
+      const oldPde = `${node.name}.pde`;
+      for (const child of Object.values(userNodes)) {
+        if (child.parentId === id && child.type === 'file' && child.name === oldPde) {
+          // finalName may have a numeric suffix from collision-nudging, but
+          // that's exactly what we want the child to mirror.
+          const newChildName = `${finalName}.pde`;
+          // Guard against collision with other siblings the new name might hit.
+          const safeChildName = nextUserName(
+            Object.fromEntries(
+              Object.entries(userNodes)
+                .filter(([k]) => k !== child.id)
+            ),
+            id, newChildName
+          );
+          extraUpdates[child.id] = { ...child, name: safeChildName };
+        }
+      }
+    }
+
     setUserNodes(prev => ({
       ...prev,
-      [id]: { ...prev[id], name: finalName }
+      [id]: { ...prev[id], name: finalName },
+      ...extraUpdates
     }));
   }, [userNodes]);
 
@@ -513,7 +575,7 @@ export default function ProcessingStudio() {
   };
 
   const tabLabelFor = (id) => {
-    if (userNodes[id]) return userNodes[id].name;
+    if (userNodes[id]) return displayFileName(userNodes[id].name);
     return t.sections[id] || id;
   };
 
@@ -549,7 +611,7 @@ export default function ProcessingStudio() {
         {!sidebarCollapsed && (
           <ResizeHandle
             direction="vertical" t={c}
-            onDrag={(delta) => setSidebarW(w => Math.max(180, Math.min(380, w + delta)))}
+            onDrag={(delta) => setSidebarW(w => Math.max(210, Math.min(380, w + delta)))}
           />
         )}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
@@ -581,6 +643,7 @@ export default function ProcessingStudio() {
             moduleLabel={moduleLabel}
             overviewCollapsed={overviewCollapsed}
             setOverviewCollapsed={setOverviewCollapsed}
+            showOverview={!isUserFile}
           />
         </div>
       </div>

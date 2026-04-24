@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { modules } from '../i18n';
 import { sectionIcons } from '../sketches';
+import { displayFileName } from '../lib/fileNames';
 import StatusDot from './StatusDot';
-import Icon from './Icon';
+import Icon, { PdeIcon, DataFolderIcon } from './Icon';
 
 // Compute the on-screen status of a lesson.
 //   done   → any lesson the user has ticked off via the status dot
@@ -70,7 +71,17 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
                 ? 'active' // playground is a sandbox — always bright
                 : computeStatus(id, activeId, visited, orderedIds);
 
-              const locked = status === 'locked';
+              const isDone = status === 'done';
+
+              // Contrast rules (UX inversion):
+              //   done   → faded — visually recedes so attention goes to
+              //            upcoming lessons. Green is reserved for the status
+              //            dot itself; we don't add extra green accents on the
+              //            row because too much green reads as "success" noise.
+              //   active → bold + orange accent bar (unchanged)
+              //   next   → full contrast (draw the eye as "up next")
+              //   locked → full contrast too (future lessons stay readable)
+              const borderColor = isActive ? c.activeRowBorder : 'transparent';
 
               return (
                 <div
@@ -83,9 +94,7 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
                     padding: isPlayground ? '7px 18px' : '6px 18px 6px 28px',
                     cursor: 'pointer',
                     background: isActive ? c.activeRow : 'transparent',
-                    borderLeft: isActive
-                      ? `2px solid ${c.activeRowBorder}`
-                      : '2px solid transparent',
+                    borderLeft: `2px solid ${borderColor}`,
                     transition: 'background 0.15s',
                     ['--hover-bg']: c.panelHover
                   }}
@@ -103,9 +112,11 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
                   )}
                   <span style={{
                     fontSize: 12, fontFamily: 'Inter, sans-serif',
-                    color: isActive ? c.text : locked ? c.textMuted : c.text,
+                    color: isActive
+                      ? c.text
+                      : isDone ? c.textMuted : c.text,
                     fontWeight: isActive ? 600 : 400,
-                    opacity: locked ? 0.65 : 1,
+                    opacity: isDone ? 0.55 : 1,
                     display: 'flex', alignItems: 'center', gap: 4,
                     flex: 1, minWidth: 0
                   }}>
@@ -262,6 +273,14 @@ function FileNode({
     }
   } : {};
 
+  // Icon choice:
+  //   folder named "data" → data-stack glyph (Processing's sketch-asset folder)
+  //   any other folder    → plain folder
+  //   .pde file           → the blue "P" tile
+  //   other files         → generic text document
+  const isDataFolder = isFolder && /^data$/i.test(node.name);
+  const isPde = !isFolder && /\.pde$/i.test(node.name);
+
   const nameLabel = (
     <span
       style={{
@@ -274,7 +293,7 @@ function FileNode({
       }}
       onDoubleClick={deletable ? (e) => { e.stopPropagation(); setEditingId(id); } : undefined}
     >
-      {node.name}
+      {isPde ? displayFileName(node.name) : node.name}
     </span>
   );
 
@@ -314,13 +333,17 @@ function FileNode({
         color: isFolder ? c.accent : (isActive ? c.accent : c.textMuted),
         display: 'inline-flex', flexShrink: 0
       }}>
-        <Icon name={isFolder ? 'folder' : 'file-text'} size={isFolder ? 14 : 13} />
+        {isDataFolder
+          ? <DataFolderIcon size={14} />
+          : isPde
+            ? <PdeIcon size={13} />
+            : <Icon name={isFolder ? 'folder' : 'file-text'} size={isFolder ? 14 : 13} />}
       </span>
 
       {isEditing ? (
         <InlineInput
           c={c}
-          initial={node.name}
+          initial={isPde ? displayFileName(node.name) : node.name}
           onCommit={(v) => onRename(id, v)}
           onCancel={() => setEditingId(null)}
         />
@@ -438,9 +461,10 @@ function FileNode({
   );
 }
 
-// The pending "new file/folder" row — an inline input with a matching icon.
+// The pending "new file/folder/sketch" row — an inline input with a matching icon.
 function PendingRow({ c, depth, type, onCommit, onCancel }) {
-  const isFolder = type === 'folder';
+  const isFolder = type === 'folder' || type === 'sketch';
+  const isSketch = type === 'sketch';
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 6,
@@ -453,12 +477,18 @@ function PendingRow({ c, depth, type, onCommit, onCancel }) {
         </span>
       )}
       <span style={{ color: c.accent, display: 'inline-flex', flexShrink: 0 }}>
-        <Icon name={isFolder ? 'folder' : 'file-text'} size={isFolder ? 14 : 13} />
+        {isSketch
+          ? <PdeIcon size={13} />
+          : <Icon name={isFolder ? 'folder' : 'file-text'} size={isFolder ? 14 : 13} />}
       </span>
       <InlineInput
         c={c}
-        initial={isFolder ? '' : 'sketch.pde'}
-        placeholder={isFolder ? 'Folder name' : 'filename.pde'}
+        initial=""
+        placeholder={
+          isSketch ? 'Sketch name'
+          : isFolder ? 'Folder name'
+          : 'Filename'
+        }
         onCommit={onCommit}
         onCancel={onCancel}
       />
@@ -581,6 +611,20 @@ function FileManager({
           color: c.textMuted, fontFamily: 'Inter, sans-serif'
         }}>MY FILES</span>
         <div style={{ display: 'flex', gap: 2 }}>
+          {/* Three creation actions, each with a distinct purpose:
+              - New sketch: folder + matching .pde (the real-Processing layout)
+              - New file:   a loose file (e.g. notes.txt, a scratch .pde)
+              - New folder: empty folder
+              Same distinction holds for the per-row hover actions below. */}
+          <button
+            onClick={() => startCreate('root', 'sketch')}
+            title="New sketch (folder + matching .pde)"
+            aria-label="New sketch"
+            className="sb-iconbtn"
+            style={{ ...iconBtn(c), color: c.accent }}
+          >
+            <PdeIcon size={14} />
+          </button>
           <button
             onClick={() => startCreate('root', 'file')}
             title="New file"
@@ -777,9 +821,10 @@ export default function Sidebar({
           aria-label="Collapse sidebar"
           className="sb-iconbtn"
           style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: 4, borderRadius: 5, color: c.textMuted,
-            display: 'flex', alignItems: 'center',
+            background: 'none', border: `1px solid ${c.border}`, cursor: 'pointer',
+            padding: '6px 8px', borderRadius: 6, color: c.textMuted,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0, minWidth: 30, minHeight: 28,
             ['--hover-color']: c.text
           }}
         >

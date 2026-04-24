@@ -5,7 +5,7 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags as T } from '@lezer/highlight';
 import { EditorView } from '@codemirror/view';
 import { sectionIcons } from '../sketches';
-import Icon from './Icon';
+import Icon, { PdeIcon } from './Icon';
 
 // Custom highlight palette pulled from the design tokens (t.sk/sb/ss/...).
 // Built per-theme so dark/light both resolve against the same token names.
@@ -105,8 +105,14 @@ export default function CodeEditor({
           const label = tabLabelFor ? tabLabelFor(id) : id;
           const isUser = userNodes && !!userNodes[id];
           const closable = tabs.length > 1;
+          // User files are nearly always .pde sketches, so show the branded
+          // Processing tile; fall back to the generic document icon for the
+          // rare case of a non-.pde user file (e.g. notes.txt).
+          const isUserPde = isUser && /\.pde$/i.test(userNodes[id].name || '');
           const displayIcon = isUser
-            ? <Icon name="file-text" size={13} />
+            ? (isUserPde
+                ? <PdeIcon size={13} />
+                : <Icon name="file-text" size={13} />)
             : (sectionIcons[id] || null);
 
           return (
