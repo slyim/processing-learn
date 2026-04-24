@@ -23,11 +23,16 @@ const USER_FILES_KEY = 'studio-user-files';
 const DEFAULT_TABS = { ids: ['playground'], active: 'playground' };
 
 // Default content for a freshly-created user sketch.
-const BLANK_SKETCH = `void setup() {
-  size(320, 240);
+// Structure mirrors Processing's own New Sketch template: canvas setup
+// on top, draw loop below, with a small comment explaining each half so
+// beginners can see where their code belongs.
+const BLANK_SKETCH = `// Runs once when the sketch starts.
+void setup() {
+  size(400, 400);
   background(18);
 }
 
+// Runs every frame (~60 times per second).
 void draw() {
   noStroke();
   fill(255, 122, 26);
@@ -333,6 +338,47 @@ export default function ProcessingStudio() {
     });
   }, [userNodes]);
 
+  const moveUserNode = useCallback((id, newParentId) => {
+    const node = userNodes[id];
+    if (!node) return;
+    const targetParent = newParentId || 'root';
+    if ((node.parentId || 'root') === targetParent) return; // no-op
+
+    // Guard: can't move a folder into itself or a descendant (would orphan the tree).
+    if (node.type === 'folder') {
+      const descendants = new Set([id]);
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const n of Object.values(userNodes)) {
+          if (descendants.has(n.parentId) && !descendants.has(n.id)) {
+            descendants.add(n.id);
+            grew = true;
+          }
+        }
+      }
+      if (descendants.has(targetParent)) return;
+    }
+
+    // If there's a name collision in the new parent, nudge with a suffix so
+    // nothing silently overwrites.
+    const siblings = Object.values(userNodes)
+      .filter(n => n.id !== id && (n.parentId || 'root') === targetParent)
+      .map(n => n.name);
+    let finalName = node.name;
+    if (siblings.includes(finalName)) {
+      finalName = nextUserName(
+        Object.fromEntries(Object.entries(userNodes).filter(([k]) => k !== id)),
+        targetParent, node.name
+      );
+    }
+
+    setUserNodes(prev => ({
+      ...prev,
+      [id]: { ...prev[id], parentId: targetParent, name: finalName }
+    }));
+  }, [userNodes]);
+
   const renameUserNode = useCallback((id, rawName) => {
     const node = userNodes[id];
     if (!node) return;
@@ -498,6 +544,7 @@ export default function ProcessingStudio() {
           onCreateNode={createUserNode}
           onDeleteNode={deleteUserNode}
           onRenameNode={renameUserNode}
+          onMoveNode={moveUserNode}
         />
         {!sidebarCollapsed && (
           <ResizeHandle

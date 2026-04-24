@@ -186,21 +186,27 @@ function InlineInput({ c, initial, onCommit, onCancel, placeholder }) {
   );
 }
 
-// A single row in the user file tree. Handles rename-in-place and
-// delete-confirm-in-place. For folders it also exposes +file / +folder
-// buttons on hover so users can nest.
+// A single row in the user file tree. Handles rename-in-place,
+// delete-confirm-in-place, and drag-and-drop moves.
+// For folders it also exposes +file / +folder buttons on hover so users
+// can nest, and acts as a drop target for reorganization.
 function FileNode({
   node, depth, c, activeId, onOpen, onToggle,
   deletable,
   editingId, setEditingId,
   confirmDeleteId, setConfirmDeleteId,
   onStartCreate, onRename, onDelete,
-  childrenNodes, pendingChild
+  childrenNodes, pendingChild,
+  draggedId, setDraggedId,
+  dragOverId, setDragOverId,
+  onDropTo
 }) {
   const isFolder = node.type === 'folder';
   const id = isFolder ? node.id : node.fileId;
   const isEditing = editingId === id;
   const isConfirming = confirmDeleteId === id;
+  const isBeingDragged = deletable && draggedId === id;
+  const isDropTarget = deletable && isFolder && dragOverId === node.id;
 
   const rowPadding = isFolder
     ? `5px 10px 5px ${10 + depth * 14}px`
@@ -213,6 +219,48 @@ function FileNode({
     if (isFolder) onToggle(node.id);
     else onOpen(node.fileId);
   };
+
+  // Drag handlers — only enabled on user nodes (deletable).
+  const dragProps = deletable ? {
+    draggable: !isEditing,
+    onDragStart: (e) => {
+      e.stopPropagation();
+      e.dataTransfer.effectAllowed = 'move';
+      // Some browsers refuse to start a drag without data on the transfer.
+      try { e.dataTransfer.setData('text/plain', id); } catch { /* ignore */ }
+      setDraggedId(id);
+    },
+    onDragEnd: () => {
+      setDraggedId(null);
+      setDragOverId(null);
+    }
+  } : {};
+
+  // Drop handlers — user folders become drop targets. Hovering a folder
+  // while dragging auto-opens it so you can drop deeper.
+  const folderDropProps = (deletable && isFolder) ? {
+    onDragOver: (e) => {
+      if (!draggedId || draggedId === node.id) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.dataTransfer.dropEffect = 'move';
+      if (dragOverId !== node.id) setDragOverId(node.id);
+    },
+    onDragLeave: (e) => {
+      // Only clear if we're actually leaving this row (not entering a child).
+      if (e.currentTarget.contains(e.relatedTarget)) return;
+      if (dragOverId === node.id) setDragOverId(null);
+    },
+    onDrop: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (draggedId && draggedId !== node.id) {
+        onDropTo(node.id);
+      }
+      setDraggedId(null);
+      setDragOverId(null);
+    }
+  } : {};
 
   const nameLabel = (
     <span
@@ -235,14 +283,21 @@ function FileNode({
       onClick={handleRowClick}
       className="sb-item"
       data-active={isActive || undefined}
+      {...dragProps}
+      {...folderDropProps}
       style={{
         display: 'flex', alignItems: 'center', gap: 6,
         padding: rowPadding,
-        cursor: isEditing ? 'text' : 'pointer',
+        cursor: isEditing ? 'text' : (deletable ? 'grab' : 'pointer'),
         background: isConfirming
           ? 'rgba(239, 68, 68, 0.12)'
-          : isActive ? c.activeRow : 'transparent',
-        borderLeft: isActive && !isFolder ? `2px solid ${c.accent}` : '2px solid transparent',
+          : isDropTarget
+            ? c.accentDim
+            : isActive ? c.activeRow : 'transparent',
+        borderLeft: isDropTarget
+          ? `2px solid ${c.accent}`
+          : (isActive && !isFolder ? `2px solid ${c.accent}` : '2px solid transparent'),
+        opacity: isBeingDragged ? 0.4 : 1,
         ['--hover-bg']: c.panelHover
       }}
     >
@@ -372,6 +427,9 @@ function FileNode({
               onRename={onRename} onDelete={onDelete}
               childrenNodes={child.children}
               pendingChild={pendingChild}
+              draggedId={draggedId} setDraggedId={setDraggedId}
+              dragOverId={dragOverId} setDragOverId={setDragOverId}
+              onDropTo={onDropTo}
             />
           ))}
         </>
@@ -432,38 +490,17 @@ function buildUserTree(userNodes, openFolders) {
   return make('root');
 }
 
-// Build the read-only course tree — each module becomes a folder, each lesson
-// becomes a .pde file.
-function buildCourseTree(t, openFolders) {
-  return modules.map((mod, mi) => {
-    const isPlayground = mod.id === 'm0';
-    const folderId = `folder-${mod.id}`;
-    const name = isPlayground
-      ? 'Playground'
-      : `Module ${mi} – ${t.modules[mod.id]}`;
-    return {
-      id: folderId,
-      type: 'folder',
-      name,
-      open: openFolders[folderId] ?? (mod.id === 'm2'),
-      children: mod.sectionIds.map(id => ({
-        id: `file-${id}`,
-        fileId: id,
-        type: 'file',
-        name: `${id.replace(/\s+/g, '_').toLowerCase()}.pde`
-      }))
-    };
-  });
-}
-
 function FileManager({
-  t, c, activeId, onOpen,
-  userNodes, onCreate, onDeleteNode, onRenameNode
+  c, activeId, onOpen,
+  userNodes, onCreate, onDeleteNode, onRenameNode, onMoveNode
 }) {
   const [openFolders, setOpenFolders] = useState({});
   const [pending, setPending] = useState(null); // {parentId, type}
   const [editingId, setEditingId] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [draggedId, setDraggedId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
+  const [rootDragOver, setRootDragOver] = useState(false);
 
   // Any click outside the confirm row cancels the confirmation.
   useEffect(() => {
@@ -477,7 +514,7 @@ function FileManager({
 
   const toggle = (id) => setOpenFolders(p => ({
     ...p,
-    [id]: !(p[id] ?? (id === 'folder-m2'))
+    [id]: !(p[id] ?? true) // default folders open so newly created items are visible
   }));
 
   const startCreate = (parentId, type) => {
@@ -510,8 +547,19 @@ function FileManager({
     onDeleteNode(id);
   };
 
+  const handleDropTo = (parentId) => {
+    if (!draggedId || !onMoveNode) return;
+    onMoveNode(draggedId, parentId || 'root');
+    setDraggedId(null);
+    setDragOverId(null);
+    setRootDragOver(false);
+    // Make sure the destination folder is visible so the move is obvious.
+    if (parentId && parentId !== 'root') {
+      setOpenFolders(p => ({ ...p, [parentId]: true }));
+    }
+  };
+
   const userTree = buildUserTree(userNodes, openFolders);
-  const courseTree = buildCourseTree(t, openFolders);
   const hasUserNodes = userTree.length > 0;
   const hasRootPending = pending && pending.parentId === 'root';
 
@@ -587,31 +635,39 @@ function FileManager({
           onRename={commitRename} onDelete={handleDelete}
           childrenNodes={node.children}
           pendingChild={pendingChildRender}
+          draggedId={draggedId} setDraggedId={setDraggedId}
+          dragOverId={dragOverId} setDragOverId={setDragOverId}
+          onDropTo={handleDropTo}
         />
       ))}
 
-      <div style={{
-        borderTop: `1px solid ${c.border}`, margin: '10px 0 2px'
-      }} />
+      {/* Root drop zone — catches drops that aren't on a folder so users can
+          move items back out of nested folders. Only "armed" while dragging. */}
+      {draggedId && userNodes[draggedId]?.parentId !== 'root' && (
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (!rootDragOver) setRootDragOver(true);
+          }}
+          onDragLeave={() => setRootDragOver(false)}
+          onDrop={(e) => { e.preventDefault(); handleDropTo('root'); }}
+          style={{
+            margin: '4px 10px 0',
+            padding: '10px 12px',
+            border: `1.5px dashed ${rootDragOver ? c.accent : c.border}`,
+            borderRadius: 6,
+            background: rootDragOver ? c.accentDim : 'transparent',
+            fontSize: 11, color: c.textMuted,
+            fontFamily: 'Inter, sans-serif',
+            textAlign: 'center',
+            pointerEvents: 'auto'
+          }}
+        >
+          Drop here to move to MY FILES root
+        </div>
+      )}
 
-      <div style={{
-        padding: '10px 12px 4px',
-        fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
-        color: c.textMuted, fontFamily: 'Inter, sans-serif'
-      }}>COURSE FILES</div>
-
-      {courseTree.map(node => (
-        <FileNode
-          key={node.id}
-          node={node} depth={0}
-          c={c} activeId={activeId}
-          onOpen={onOpen} onToggle={toggle}
-          deletable={false}
-          editingId={null} setEditingId={() => {}}
-          confirmDeleteId={null} setConfirmDeleteId={() => {}}
-          childrenNodes={node.children}
-        />
-      ))}
       <div style={{ height: 24 }} />
     </div>
   );
@@ -631,7 +687,7 @@ export default function Sidebar({
   t, c, collapsed, setCollapsed, tab, setTab,
   activeId, onOpen, visited, orderedIds, width,
   onToggleDone,
-  userNodes, onCreateNode, onDeleteNode, onRenameNode
+  userNodes, onCreateNode, onDeleteNode, onRenameNode, onMoveNode
 }) {
   if (collapsed) {
     return (
@@ -738,11 +794,12 @@ export default function Sidebar({
             onToggleDone={onToggleDone}
           />
         : <FileManager
-            t={t} c={c} activeId={activeId} onOpen={onOpen}
+            c={c} activeId={activeId} onOpen={onOpen}
             userNodes={userNodes}
             onCreate={onCreateNode}
             onDeleteNode={onDeleteNode}
             onRenameNode={onRenameNode}
+            onMoveNode={onMoveNode}
           />
       }
     </div>
