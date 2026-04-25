@@ -13,41 +13,13 @@ function SectionLabel({ label, c }) {
   );
 }
 
-function CanvasPreview({ c, canvasRef, sectionNum }) {
-  return (
-    <div style={{
-      flex: 1, background: c.canvasBg,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative', overflow: 'hidden', minHeight: 0, padding: '20px'
-    }}>
-      <div ref={canvasRef} style={{
-        background: c.canvasFrame,
-        borderRadius: 4,
-        overflow: 'hidden',
-        boxShadow: '0 4px 32px rgba(0, 0, 0, 0.5)',
-        maxWidth: '100%', maxHeight: '100%'
-      }} />
-      <div style={{
-        position: 'absolute', top: 10, left: 12,
-        fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em',
-        color: 'rgba(255,255,255,0.3)',
-        fontFamily: '"JetBrains Mono", monospace'
-      }}>
-        PREVIEW{sectionNum ? ` · ${sectionNum}` : ''}
-      </div>
-    </div>
-  );
-}
-
 function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, collapsed, setCollapsed }) {
   return (
     <div style={{
       background: c.overviewBg,
       borderTop: `1px solid ${c.border}`,
       display: 'flex', flexDirection: 'column', flexShrink: 0,
-      maxHeight: collapsed ? 42 : '60%',
-      minHeight: collapsed ? 42 : 200,
-      transition: 'max-height 0.3s ease, min-height 0.3s ease',
+      flex: 1, minHeight: 0,
       overflow: 'hidden'
     }}>
       <div
@@ -152,7 +124,27 @@ function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, c
   );
 }
 
-export default function RightPanel({ t, c, canvasRef, lesson, sectionNum, sectionTitle, moduleLabel, overviewCollapsed, setOverviewCollapsed, showOverview = true }) {
+export default function RightPanel({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, overviewCollapsed, setOverviewCollapsed, showOverview = true, hasActive }) {
+  if (!showOverview) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column',
+        background: c.panel,
+        borderLeft: `1px solid ${c.border}`,
+        flexShrink: 0, width: '100%', height: '100%',
+        alignItems: 'center', justifyContent: 'center',
+        padding: 22, color: c.textMuted, textAlign: 'center'
+      }}>
+        <div style={{
+          fontSize: 11.5, fontFamily: 'Inter, sans-serif', lineHeight: 1.5
+        }}>
+          {hasActive
+            ? 'Lesson overview is hidden for your own files.'
+            : 'Open a lesson to see its overview here.'}
+        </div>
+      </div>
+    );
+  }
   return (
     <div style={{
       display: 'flex', flexDirection: 'column',
@@ -161,18 +153,15 @@ export default function RightPanel({ t, c, canvasRef, lesson, sectionNum, sectio
       flexShrink: 0, width: '100%', height: '100%',
       overflow: 'hidden'
     }}>
-      <CanvasPreview c={c} canvasRef={canvasRef} sectionNum={sectionNum} />
-      {showOverview && (
-        <CourseOverview
-          t={t} c={c}
-          lesson={lesson}
-          sectionNum={sectionNum}
-          sectionTitle={sectionTitle}
-          moduleLabel={moduleLabel}
-          collapsed={overviewCollapsed}
-          setCollapsed={setOverviewCollapsed}
-        />
-      )}
+      <CourseOverview
+        t={t} c={c}
+        lesson={lesson}
+        sectionNum={sectionNum}
+        sectionTitle={sectionTitle}
+        moduleLabel={moduleLabel}
+        collapsed={overviewCollapsed}
+        setCollapsed={setOverviewCollapsed}
+      />
     </div>
   );
 }

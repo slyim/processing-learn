@@ -1,8 +1,5 @@
-// Numbered course structure. The `playground` module is a single blank sketch
-// where learners can experiment freely — keep it as its own module so the
-// numbered lesson sequence stays stable.
+// Numbered course structure.
 export const modules = [
-  { id: 'm0', sectionIds: ['playground'] },
   { id: 'm1', sectionIds: ['intro', 'fundamentals', 'colors'] },
   { id: 'm2', sectionIds: ['variables', 'conditionals', 'loops', 'functions'] },
   { id: 'm3', sectionIds: ['interaction', 'keyboard'] },
@@ -11,20 +8,18 @@ export const modules = [
   { id: 'm6', sectionIds: ['text', 'gradient'] }
 ];
 
-// Return "2.3" style number for a lesson section, or empty string for the
-// playground (it isn't part of the numbered curriculum).
+// Return "2.3" style number for a lesson section.
 export function sectionNumber(id) {
   for (let mi = 0; mi < modules.length; mi++) {
-    if (modules[mi].id === 'm0') continue;
     const idx = modules[mi].sectionIds.indexOf(id);
-    if (idx !== -1) return `${mi}.${idx + 1}`;
+    if (idx !== -1) return `${mi + 1}.${idx + 1}`;
   }
   return '';
 }
 
 export function moduleNumber(id) {
   const i = modules.findIndex(m => m.id === id);
-  return i <= 0 ? '' : String(i);
+  return i < 0 ? '' : String(i + 1);
 }
 
 const SHARED = {
@@ -62,8 +57,11 @@ export const translations = {
     tabFiles: 'Files',
     lessonOverview: 'LESSON OVERVIEW',
     running: 'Running…',
+    nothingOpen: 'Nothing is open',
+    nothingOpenHint: 'Open a lesson from the Courses tab, or create a sketch in the Files tab.',
+    prevLesson: 'Previous',
+    nextLesson: 'Next',
     modules: {
-      m0: 'Playground',
       m1: 'Foundations',
       m2: 'Logic & Control Flow',
       m3: 'User Input',
@@ -315,8 +313,11 @@ export const translations = {
     tabFiles: 'Dosyalar',
     lessonOverview: 'DERS ÖZETİ',
     running: 'Çalışıyor…',
+    nothingOpen: 'Hiçbir şey açık değil',
+    nothingOpenHint: 'Dersler sekmesinden bir ders açın veya Dosyalar sekmesinde yeni bir çizim oluşturun.',
+    prevLesson: 'Önceki',
+    nextLesson: 'Sonraki',
     modules: {
-      m0: 'Deneme Alanı',
       m1: 'Temeller',
       m2: 'Mantık ve Akış Kontrolü',
       m3: 'Kullanıcı Girişi',
@@ -568,8 +569,11 @@ export const translations = {
     tabFiles: 'Dateien',
     lessonOverview: 'LEKTIONSÜBERSICHT',
     running: 'Läuft…',
+    nothingOpen: 'Nichts geöffnet',
+    nothingOpenHint: 'Öffne eine Lektion im Kurse-Tab oder erstelle eine Skizze im Dateien-Tab.',
+    prevLesson: 'Zurück',
+    nextLesson: 'Weiter',
     modules: {
-      m0: 'Spielwiese',
       m1: 'Grundlagen',
       m2: 'Logik & Kontrollfluss',
       m3: 'Benutzereingabe',

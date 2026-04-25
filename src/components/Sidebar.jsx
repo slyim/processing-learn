@@ -21,14 +21,46 @@ function computeStatus(id, activeId, visited, orderedIds) {
   return 'locked';
 }
 
-function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone }) {
+function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone, onPrev, onNext }) {
   const [collapsedMods, setCollapsedMods] = useState({});
   const toggleMod = (id) => setCollapsedMods(p => ({ ...p, [id]: !p[id] }));
 
+  const navIdx = orderedIds.indexOf(activeId);
+  const prevDisabled = navIdx <= 0;
+  const nextDisabled = navIdx === -1 || navIdx >= orderedIds.length - 1;
+
   return (
-    <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '8px 0' }}>
-      {modules.map((mod, mi) => {
-        const isPlayground = mod.id === 'm0';
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{
+        display: 'flex', gap: 6,
+        padding: '10px 12px',
+        borderBottom: `1px solid ${c.border}`, flexShrink: 0
+      }}>
+        <button
+          onClick={onPrev}
+          disabled={prevDisabled}
+          title={t.prevLesson || 'Previous'}
+          aria-label={t.prevLesson || 'Previous'}
+          className="btn-ghost"
+          style={lessonNavBtn(c, prevDisabled)}
+        >
+          <Icon name="arrow-back" size={13} />
+          <span>{t.prevLesson || 'Previous'}</span>
+        </button>
+        <button
+          onClick={onNext}
+          disabled={nextDisabled}
+          title={t.nextLesson || 'Next'}
+          aria-label={t.nextLesson || 'Next'}
+          className="btn-ghost"
+          style={lessonNavBtn(c, nextDisabled)}
+        >
+          <span>{t.nextLesson || 'Next'}</span>
+          <Icon name="arrow-forward" size={13} />
+        </button>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '8px 0' }}>
+        {modules.map((mod, mi) => {
         const collapsed = collapsedMods[mod.id];
 
         return (
@@ -50,37 +82,23 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
               <div>
                 <div style={{
                   fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em',
-                  color: isPlayground ? c.textMuted : c.moduleLabel,
+                  color: c.moduleLabel,
                   fontFamily: 'Inter, sans-serif'
                 }}>
-                  {isPlayground ? 'PLAYGROUND' : `MODULE ${mi}`}
+                  {`MODULE ${mi + 1}`}
                 </div>
-                {!isPlayground && (
-                  <div style={{
-                    fontSize: 9, fontWeight: 600, letterSpacing: '0.07em',
-                    color: c.textMuted, fontFamily: 'Inter, sans-serif', marginTop: 1,
-                    textTransform: 'uppercase'
-                  }}>{t.modules[mod.id]}</div>
-                )}
+                <div style={{
+                  fontSize: 9, fontWeight: 600, letterSpacing: '0.07em',
+                  color: c.textMuted, fontFamily: 'Inter, sans-serif', marginTop: 1,
+                  textTransform: 'uppercase'
+                }}>{t.modules[mod.id]}</div>
               </div>
             </div>
 
             {!collapsed && mod.sectionIds.map(id => {
               const isActive = id === activeId;
-              const status = isPlayground
-                ? 'active' // playground is a sandbox — always bright
-                : computeStatus(id, activeId, visited, orderedIds);
-
+              const status = computeStatus(id, activeId, visited, orderedIds);
               const isDone = status === 'done';
-
-              // Contrast rules (UX inversion):
-              //   done   → faded — visually recedes so attention goes to
-              //            upcoming lessons. Green is reserved for the status
-              //            dot itself; we don't add extra green accents on the
-              //            row because too much green reads as "success" noise.
-              //   active → bold + orange accent bar (unchanged)
-              //   next   → full contrast (draw the eye as "up next")
-              //   locked → full contrast too (future lessons stay readable)
               const borderColor = isActive ? c.activeRowBorder : 'transparent';
 
               return (
@@ -91,7 +109,7 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
                   data-active={isActive || undefined}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 9,
-                    padding: isPlayground ? '7px 18px' : '6px 18px 6px 28px',
+                    padding: '6px 18px 6px 28px',
                     cursor: 'pointer',
                     background: isActive ? c.activeRow : 'transparent',
                     borderLeft: `2px solid ${borderColor}`,
@@ -99,17 +117,11 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
                     ['--hover-bg']: c.panelHover
                   }}
                 >
-                  {isPlayground ? (
-                    <span style={{ color: c.accent, width: 14, display: 'inline-flex', justifyContent: 'center' }}>
-                      <Icon name="edit" size={13} />
-                    </span>
-                  ) : (
-                    <StatusDot
-                      status={status}
-                      t={c}
-                      onToggle={() => onToggleDone(id)}
-                    />
-                  )}
+                  <StatusDot
+                    status={status}
+                    t={c}
+                    onToggle={() => onToggleDone(id)}
+                  />
                   <span style={{
                     fontSize: 12, fontFamily: 'Inter, sans-serif',
                     color: isActive
@@ -120,20 +132,18 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
                     display: 'flex', alignItems: 'center', gap: 4,
                     flex: 1, minWidth: 0
                   }}>
-                    {!isPlayground && (
-                      <span style={{
-                        fontSize: 10.5, color: c.textMuted, marginRight: 3,
-                        fontVariantNumeric: 'tabular-nums'
-                      }}>
-                        {`${mi}.${mod.sectionIds.indexOf(id) + 1}`}
-                      </span>
-                    )}
+                    <span style={{
+                      fontSize: 10.5, color: c.textMuted, marginRight: 3,
+                      fontVariantNumeric: 'tabular-nums'
+                    }}>
+                      {`${mi + 1}.${mod.sectionIds.indexOf(id) + 1}`}
+                    </span>
                     <span style={{ marginRight: 4 }}>{sectionIcons[id]}</span>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {t.sections[id]}
                     </span>
                   </span>
-                  {isActive && !isPlayground && (
+                  {isActive && (
                     <span style={{
                       marginLeft: 'auto', fontSize: 9, fontWeight: 700,
                       letterSpacing: '0.05em',
@@ -148,9 +158,25 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone 
           </div>
         );
       })}
-      <div style={{ height: 32 }} />
+        <div style={{ height: 32 }} />
+      </div>
     </div>
   );
+}
+
+function lessonNavBtn(c, disabled) {
+  return {
+    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+    background: disabled ? 'transparent' : c.resetBg,
+    color: disabled ? c.textDim : c.text,
+    border: `1px solid ${disabled ? c.borderLight : c.resetBorder}`,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    padding: '5px 10px', borderRadius: 6,
+    fontSize: 11.5, fontWeight: 600,
+    fontFamily: 'Inter, sans-serif',
+    transition: 'all 0.15s',
+    ['--hover-border']: c.accentBorder
+  };
 }
 
 // Inline input used for both "create new" (pending rows) and "rename".
@@ -731,7 +757,8 @@ export default function Sidebar({
   t, c, collapsed, setCollapsed, tab, setTab,
   activeId, onOpen, visited, orderedIds, width,
   onToggleDone,
-  userNodes, onCreateNode, onDeleteNode, onRenameNode, onMoveNode
+  userNodes, onCreateNode, onDeleteNode, onRenameNode, onMoveNode,
+  onPrevLesson, onNextLesson
 }) {
   if (collapsed) {
     return (
@@ -837,6 +864,7 @@ export default function Sidebar({
             t={t} c={c} activeId={activeId} onOpen={onOpen}
             visited={visited} orderedIds={orderedIds}
             onToggleDone={onToggleDone}
+            onPrev={onPrevLesson} onNext={onNextLesson}
           />
         : <FileManager
             c={c} activeId={activeId} onOpen={onOpen}

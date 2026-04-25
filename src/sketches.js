@@ -2,21 +2,6 @@
 // Transpiled to p5.js JS before execution — see transpile.js.
 // Color palette: YTÜ orange (#ff7a1a) and a soft amber (#ffb347) accent.
 export const sketches = {
-  playground: `// Welcome to your Playground.
-// Write any Processing code here and press Run.
-// Arrow, class, array, void/function, int/float — all supported.
-
-void setup() {
-  size(320, 240);
-  background(18);
-}
-
-void draw() {
-  noStroke();
-  fill(255, 122, 26);
-  circle(mouseX, mouseY, 40);
-}`,
-
   intro: `void setup() {
   size(320, 240);
   background(18);
@@ -413,7 +398,6 @@ void draw() {
 };
 
 export const sectionIds = [
-  'playground',
   'intro', 'fundamentals', 'colors', 'variables', 'conditionals',
   'loops', 'functions', 'interaction', 'keyboard', 'animation',
   'transforms', 'particles', 'classes', 'trigonometry', 'noise',
@@ -421,7 +405,6 @@ export const sectionIds = [
 ];
 
 export const sectionIcons = {
-  playground: '🧪',
   intro: '🎨', fundamentals: '🔷', colors: '🌈', variables: '📊',
   conditionals: '🔀', loops: '🔄', functions: '🧩', interaction: '🖱️',
   keyboard: '⌨️', animation: '🎬', transforms: '🌀', particles: '✨',

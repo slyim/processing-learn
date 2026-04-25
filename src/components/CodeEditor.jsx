@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { java } from '@codemirror/lang-java';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -28,11 +28,15 @@ function buildHighlightStyle(c) {
 export default function CodeEditor({
   t, c, code, onCodeChange, fontSize,
   tabs, activeId, tabLabelFor, userNodes,
-  onFocusTab, onCloseTab, onNewTab,
-  onRun, onReset, onDownload, onUpload, onPrev, onNext,
-  error, running
+  onFocusTab, onCloseTab, onReorderTab,
+  onRun, onReset, onDownload, onUpload,
+  error
 }) {
   const fileInputRef = useRef(null);
+  const [draggedTab, setDraggedTab] = useState(null);
+  const [dragOverTab, setDragOverTab] = useState(null);
+
+  const hasActive = !!activeId;
 
   const extensions = useMemo(() => {
     const editorChrome = EditorView.theme({
@@ -104,22 +108,44 @@ export default function CodeEditor({
           const isActive = id === activeId;
           const label = tabLabelFor ? tabLabelFor(id) : id;
           const isUser = userNodes && !!userNodes[id];
-          const closable = tabs.length > 1;
-          // User files are nearly always .pde sketches, so show the branded
-          // Processing tile; fall back to the generic document icon for the
-          // rare case of a non-.pde user file (e.g. notes.txt).
           const isUserPde = isUser && /\.pde$/i.test(userNodes[id].name || '');
           const displayIcon = isUser
             ? (isUserPde
                 ? <PdeIcon size={13} />
                 : <Icon name="file-text" size={13} />)
             : (sectionIcons[id] || null);
+          const isDragOver = dragOverTab === id && draggedTab && draggedTab !== id;
 
           return (
             <div
               key={id}
               onClick={() => onFocusTab(id)}
-              onAuxClick={(e) => { if (e.button === 1 && closable) { e.preventDefault(); onCloseTab(id); } }}
+              onAuxClick={(e) => { if (e.button === 1) { e.preventDefault(); onCloseTab(id); } }}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                try { e.dataTransfer.setData('text/plain', id); } catch { /* ignore */ }
+                setDraggedTab(id);
+              }}
+              onDragOver={(e) => {
+                if (!draggedTab || draggedTab === id) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (dragOverTab !== id) setDragOverTab(id);
+              }}
+              onDragLeave={(e) => {
+                if (e.currentTarget.contains(e.relatedTarget)) return;
+                if (dragOverTab === id) setDragOverTab(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (draggedTab && draggedTab !== id && onReorderTab) {
+                  onReorderTab(draggedTab, id);
+                }
+                setDraggedTab(null);
+                setDragOverTab(null);
+              }}
+              onDragEnd={() => { setDraggedTab(null); setDragOverTab(null); }}
               className="editor-tab"
               data-active={isActive || undefined}
               style={{
@@ -128,6 +154,8 @@ export default function CodeEditor({
                 background: isActive ? c.tabActive : 'transparent',
                 borderRight: `1px solid ${c.border}`,
                 borderBottom: isActive ? `2px solid ${c.accent}` : '2px solid transparent',
+                borderLeft: isDragOver ? `2px solid ${c.accent}` : '2px solid transparent',
+                opacity: draggedTab === id ? 0.5 : 1,
                 transition: 'background 0.12s',
                 ['--hover-bg']: c.tabHover
               }}
@@ -142,67 +170,90 @@ export default function CodeEditor({
                 color: isActive ? c.text : c.textMuted,
                 whiteSpace: 'nowrap'
               }}>{label}</span>
-              {closable && (
-                <button
-                  className="editor-tab-close"
-                  onClick={(e) => { e.stopPropagation(); onCloseTab(id); }}
-                  aria-label={`Close ${label}`}
-                  title="Close"
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    padding: 2, color: c.textDim,
-                    display: 'flex', alignItems: 'center',
-                    borderRadius: 3, marginLeft: 2, opacity: 0.6
-                  }}
-                >
-                  <Icon name="close" size={12} />
-                </button>
-              )}
+              <button
+                className="editor-tab-close"
+                onClick={(e) => { e.stopPropagation(); onCloseTab(id); }}
+                aria-label={`Close ${label}`}
+                title="Close (Ctrl+W)"
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  padding: 2, color: c.textDim,
+                  display: 'flex', alignItems: 'center',
+                  borderRadius: 3, marginLeft: 2, opacity: 0.6
+                }}
+              >
+                <Icon name="close" size={12} />
+              </button>
             </div>
           );
         })}
-        <button
-          onClick={onNewTab}
-          className="editor-tab-new"
-          title="New tab"
-          aria-label="New tab"
-          style={{
-            padding: '0 12px', background: 'none', border: 'none',
-            cursor: 'pointer', color: c.textDim,
-            display: 'flex', alignItems: 'center'
-          }}
-        >
-          <Icon name="plus" size={13} />
-        </button>
         <div style={{
           flex: 1, display: 'flex', alignItems: 'center',
-          justifyContent: 'flex-end', padding: '0 14px'
+          justifyContent: 'flex-end', padding: '0 8px 0 14px'
         }}>
-          <span style={{
-            fontSize: 10.5, color: c.textMuted,
-            fontFamily: '"JetBrains Mono", monospace',
-            opacity: 0.7, letterSpacing: '0.05em'
-          }}>{t.editorSub}</span>
+          {hasActive && (
+            <button
+              onClick={onRun}
+              title={`${t.run} (Ctrl+R)`}
+              aria-label={t.run}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: c.accent, color: '#fff',
+                border: 'none', borderRadius: 5,
+                cursor: 'pointer',
+                padding: '4px 9px', height: 24,
+                boxShadow: `0 1px 4px ${c.accentDim}`,
+                transition: 'filter 0.12s'
+              }}
+              onMouseDown={(e) => { e.currentTarget.style.filter = 'brightness(0.92)'; }}
+              onMouseUp={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}
+            >
+              <Icon name="play-circle" size={13} />
+            </button>
+          )}
         </div>
       </div>
 
       <div style={{ flex: 1, overflow: 'hidden', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        <CodeMirror
-          value={code}
-          height="100%"
-          theme="none"
-          extensions={extensions}
-          onChange={onCodeChange}
-          basicSetup={{
-            lineNumbers: true,
-            highlightActiveLine: true,
-            foldGutter: true,
-            indentOnInput: true,
-            bracketMatching: true,
-            closeBrackets: true
-          }}
-          style={{ flex: 1, minHeight: 0, background: c.editorBg }}
-        />
+        {hasActive ? (
+          <CodeMirror
+            value={code}
+            height="100%"
+            theme="none"
+            extensions={extensions}
+            onChange={onCodeChange}
+            basicSetup={{
+              lineNumbers: true,
+              highlightActiveLine: true,
+              foldGutter: true,
+              indentOnInput: true,
+              bracketMatching: true,
+              closeBrackets: true
+            }}
+            style={{ flex: 1, minHeight: 0, background: c.editorBg }}
+          />
+        ) : (
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            color: c.textMuted, gap: 10, padding: 24, textAlign: 'center'
+          }}>
+            <span style={{ color: c.textDim, display: 'inline-flex' }}>
+              <Icon name="file-text" size={38} />
+            </span>
+            <div style={{
+              fontSize: 14, fontWeight: 600, color: c.text,
+              fontFamily: 'Inter, sans-serif'
+            }}>{t.nothingOpen || 'Nothing is open'}</div>
+            <div style={{
+              fontSize: 12, color: c.textMuted, lineHeight: 1.55,
+              fontFamily: 'Inter, sans-serif', maxWidth: 320
+            }}>
+              {t.nothingOpenHint || 'Open a lesson from the Courses tab, or create a sketch in the Files tab.'}
+            </div>
+          </div>
+        )}
       </div>
 
       {error && (
@@ -217,69 +268,42 @@ export default function CodeEditor({
         }}>⚠ {error}</div>
       )}
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '10px 16px',
-        background: c.panel, borderTop: `1px solid ${c.border}`, flexShrink: 0
-      }}>
-        <button onClick={onRun} className="btn-run" style={{
-          display: 'flex', alignItems: 'center', gap: 7,
-          background: running ? c.accentHover : c.runBg,
-          color: c.runText, border: 'none', cursor: 'pointer',
-          padding: '7px 18px', borderRadius: 7,
-          fontSize: 13, fontWeight: 700,
-          fontFamily: 'Inter, sans-serif', letterSpacing: '0.01em',
-          transition: 'all 0.15s',
-          boxShadow: `0 2px 8px ${c.accentDim}`
+      {hasActive && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '10px 16px',
+          background: c.panel, borderTop: `1px solid ${c.border}`, flexShrink: 0
         }}>
-          {running ? (
-            <>
-              <Icon name="pause-circle" size={14} />
-              {t.running}
-            </>
-          ) : (
-            <>
-              <Icon name="play-circle" size={14} />
-              {t.run}
-            </>
-          )}
-        </button>
-        <button onClick={onReset} className="btn-ghost" style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          background: c.resetBg, color: c.resetText,
-          border: `1px solid ${c.resetBorder}`, cursor: 'pointer',
-          padding: '7px 14px', borderRadius: 7,
-          fontSize: 13, fontWeight: 500,
-          fontFamily: 'Inter, sans-serif', transition: 'all 0.15s',
-          ['--hover-border']: c.accentBorder
-        }}>
-          <Icon name="refresh" size={13} />
-          {t.reset}
-        </button>
+          <button onClick={onReset} className="btn-ghost" style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: c.resetBg, color: c.resetText,
+            border: `1px solid ${c.resetBorder}`, cursor: 'pointer',
+            padding: '7px 14px', borderRadius: 7,
+            fontSize: 13, fontWeight: 500,
+            fontFamily: 'Inter, sans-serif', transition: 'all 0.15s',
+            ['--hover-border']: c.accentBorder
+          }}>
+            <Icon name="refresh" size={13} />
+            {t.reset}
+          </button>
 
-        <div style={{ flex: 1 }} />
+          <div style={{ flex: 1 }} />
 
-        <button onClick={onDownload} title={t.download} className="btn-icon" style={iconBtnStyle(c)}>
-          <Icon name="download" size={14} />
-        </button>
-        <button onClick={() => fileInputRef.current?.click()} title={t.upload} className="btn-icon" style={iconBtnStyle(c)}>
-          <Icon name="upload" size={14} />
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pde,.txt,.java,text/plain"
-          style={{ display: 'none' }}
-          onChange={onUpload}
-        />
-
-        <button onClick={onPrev} title="Previous" className="btn-icon" style={iconBtnStyle(c)}>
-          <Icon name="arrow-back" size={13} />
-        </button>
-        <button onClick={onNext} title="Next" className="btn-icon" style={iconBtnStyle(c)}>
-          <Icon name="arrow-forward" size={13} />
-        </button>
-      </div>
+          <button onClick={onDownload} title={t.download} className="btn-icon" style={iconBtnStyle(c)}>
+            <Icon name="download" size={14} />
+          </button>
+          <button onClick={() => fileInputRef.current?.click()} title={t.upload} className="btn-icon" style={iconBtnStyle(c)}>
+            <Icon name="upload" size={14} />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pde,.txt,.java,text/plain"
+            style={{ display: 'none' }}
+            onChange={onUpload}
+          />
+        </div>
+      )}
     </div>
   );
 }
