@@ -72,7 +72,7 @@ export const themes = {
     runBg: '#e8620a', runText: '#fff',
     resetBg: '#f4f1eb', resetBorder: '#dddad3', resetText: '#1c1916',
     badge: '#e8620a',
-    canvasBg: '#1c1916',
+    canvasBg: '#e6e2d8',
     canvasFrame: '#ffffff',
     overviewBg: '#fdfcf9',
     tryBg: 'rgba(232, 98, 10, 0.07)',

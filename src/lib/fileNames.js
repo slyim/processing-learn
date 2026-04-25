@@ -1,14 +1,10 @@
 // Helpers for displaying and normalizing user filenames.
 //
-// The IDE only supports Processing sketches, so showing ".pde" everywhere just
-// adds noise. Storage keeps the extension so downloads still produce .pde
-// files; the UI strips it on display.
+// The IDE shows the full filename including .pde — matches Processing's
+// convention and makes it obvious which files are sketches vs. assets.
 
-// Strip the trailing .pde (case-insensitive). Leaves other extensions
-// (e.g. "notes.txt") untouched.
 export function displayFileName(name) {
-  if (!name) return '';
-  return name.replace(/\.pde$/i, '');
+  return name || '';
 }
 
 // Inverse: if the user typed a bare name, append .pde so storage stays

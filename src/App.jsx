@@ -9,8 +9,8 @@ import Sidebar from './components/Sidebar';
 import CodeEditor from './components/CodeEditor';
 import RightPanel from './components/RightPanel';
 import ResizeHandle from './components/ResizeHandle';
+import CanvasWindow from './components/CanvasWindow';
 
-const PLAYGROUND_STORAGE_KEY = 'playground-code';
 const TABS_KEY = 'studio-tabs';
 const SIDEBAR_W_KEY = 'studio-sidebar-w';
 const RIGHT_W_KEY = 'studio-right-w';
@@ -20,8 +20,9 @@ const VISITED_KEY = 'studio-visited';
 const SIDEBAR_TAB_KEY = 'studio-sidebar-tab';
 const FONT_SIZE_KEY = 'studio-font-size';
 const USER_FILES_KEY = 'studio-user-files';
+const CANVAS_OPEN_KEY = 'studio-canvas-open';
 
-const DEFAULT_TABS = { ids: ['playground'], active: 'playground' };
+const DEFAULT_TABS = { ids: [], active: null };
 
 // Default content for a freshly-created user sketch.
 // Structure mirrors Processing's own New Sketch template: canvas setup
@@ -48,7 +49,7 @@ function loadTabs(userNodes) {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.ids)) return DEFAULT_TABS;
     const ids = parsed.ids.filter(id =>
-      id === 'playground' || id in sketches || (userNodes && userNodes[id])
+      id in sketches || (userNodes && userNodes[id])
     );
     if (ids.length === 0) return DEFAULT_TABS;
     const active = typeof parsed.active === 'string' && ids.includes(parsed.active)
@@ -96,9 +97,7 @@ function loadUserNodes() {
 }
 
 function initialCodeFor(id, userNodes) {
-  if (id === 'playground') {
-    return localStorage.getItem(PLAYGROUND_STORAGE_KEY) || sketches.playground;
-  }
+  if (!id) return '';
   if (userNodes && userNodes[id] && userNodes[id].type === 'file') {
     return userNodes[id].content || '';
   }
@@ -147,43 +146,42 @@ export default function ProcessingStudio() {
   // Font size is persisted but there's no UI to change it yet — hence no setter.
   const [fontSize] = useState(() => loadNum(FONT_SIZE_KEY, 13, 11, 20));
   const [visited, setVisited] = useState(loadSet(VISITED_KEY));
-  const [running, setRunning] = useState(false);
   const [error, setError] = useState(null);
+  const [canvasOpen, setCanvasOpen] = useState(() => loadBool(CANVAS_OPEN_KEY, true));
 
   const canvasRef = useRef(null);
   const p5Instance = useRef(null);
   const runTimerRef = useRef(null);
-  const runningTimerRef = useRef(null);
 
   const t = translations[lang];
   const c = themes[themeName];
   const activeId = tabs.active;
-  const code = buffers[activeId] ?? initialCodeFor(activeId, userNodes);
-  const isPlayground = activeId === 'playground';
-  const isUserFile = !!userNodes[activeId];
+  const hasActive = !!activeId;
+  const code = hasActive ? (buffers[activeId] ?? initialCodeFor(activeId, userNodes)) : '';
+  const isUserFile = hasActive && !!userNodes[activeId];
+  const isLesson = hasActive && !isUserFile;
 
-  // Ordered list of non-playground lesson IDs for prev/next nav + status calc
-  const orderedIds = useMemo(() => sectionIds.filter(id => id !== 'playground'), []);
+  const orderedIds = useMemo(() => sectionIds, []);
 
   const currentModule = useMemo(
-    () => modules.find(m => m.sectionIds.includes(activeId)),
-    [activeId]
+    () => hasActive ? modules.find(m => m.sectionIds.includes(activeId)) : null,
+    [activeId, hasActive]
   );
   const moduleIndex = modules.findIndex(m => m.id === currentModule?.id);
   const sectionNum = useMemo(() => {
-    if (!currentModule || isPlayground || isUserFile) return '';
-    return `${moduleIndex}.${currentModule.sectionIds.indexOf(activeId) + 1}`;
-  }, [currentModule, moduleIndex, activeId, isPlayground, isUserFile]);
+    if (!currentModule || !isLesson) return '';
+    return `${moduleIndex + 1}.${currentModule.sectionIds.indexOf(activeId) + 1}`;
+  }, [currentModule, moduleIndex, activeId, isLesson]);
   const moduleLabel = useMemo(() => {
     if (isUserFile) return 'MY FILES';
     if (!currentModule) return '';
-    if (isPlayground) return t.playgroundBadge;
-    return `${t.moduleWord} ${moduleIndex} · ${t.modules[currentModule.id]}`;
-  }, [currentModule, moduleIndex, isPlayground, isUserFile, t]);
+    return `${t.moduleWord} ${moduleIndex + 1} · ${t.modules[currentModule.id]}`;
+  }, [currentModule, moduleIndex, isUserFile, t]);
 
   // Build a synthetic "lesson" payload for the overview panel. For user files
   // we fall back to a minimal blurb since there's no curriculum copy.
   const lesson = useMemo(() => {
+    if (!hasActive) return null;
     if (isUserFile) {
       return {
         id: activeId,
@@ -193,16 +191,17 @@ export default function ProcessingStudio() {
           'Rename by double-clicking in the sidebar.',
           'Use the trash icon to delete. This cannot be undone.'
         ],
-        tryIt: 'Write something weird. The Playground and your files all share the same transpiler.'
+        tryIt: 'Write something weird. Your files all share the same transpiler.'
       };
     }
     return { ...t.lessons[activeId], id: activeId };
-  }, [activeId, isUserFile, t]);
+  }, [activeId, hasActive, isUserFile, t]);
 
   const sectionTitle = useMemo(() => {
+    if (!hasActive) return '';
     if (isUserFile) return userNodes[activeId].name;
     return t.sections[activeId];
-  }, [activeId, isUserFile, userNodes, t]);
+  }, [activeId, hasActive, isUserFile, userNodes, t]);
 
   // Persist everything
   useEffect(() => { localStorage.setItem('lang', lang); }, [lang]);
@@ -216,6 +215,7 @@ export default function ProcessingStudio() {
   useEffect(() => { localStorage.setItem(FONT_SIZE_KEY, String(fontSize)); }, [fontSize]);
   useEffect(() => { localStorage.setItem(VISITED_KEY, JSON.stringify([...visited])); }, [visited]);
   useEffect(() => { localStorage.setItem(USER_FILES_KEY, JSON.stringify(userNodes)); }, [userNodes]);
+  useEffect(() => { localStorage.setItem(CANVAS_OPEN_KEY, String(canvasOpen)); }, [canvasOpen]);
 
   // Body bg follows theme (prevents white flash on route-load)
   useEffect(() => {
@@ -241,27 +241,32 @@ export default function ProcessingStudio() {
 
   const closeTab = useCallback((id) => {
     setTabs(prev => {
-      if (prev.ids.length <= 1) return prev;
       const idx = prev.ids.indexOf(id);
       if (idx === -1) return prev;
       const ids = prev.ids.filter(x => x !== id);
       const active = prev.active === id
-        ? ids[Math.min(idx, ids.length - 1)]
+        ? (ids.length === 0 ? null : ids[Math.min(idx, ids.length - 1)])
         : prev.active;
       return { ids, active };
     });
     setBuffers(prev => {
       if (!(id in prev)) return prev;
-      if (id === 'playground') return prev;
       const { [id]: _, ...rest } = prev;
       return rest;
     });
   }, []);
 
-  const newTab = useCallback(() => {
-    // "+" in the editor tabbar opens the playground sandbox.
-    openTab('playground');
-  }, [openTab]);
+  const reorderTabs = useCallback((fromId, toId) => {
+    setTabs(prev => {
+      const from = prev.ids.indexOf(fromId);
+      const to = prev.ids.indexOf(toId);
+      if (from === -1 || to === -1 || from === to) return prev;
+      const ids = prev.ids.slice();
+      ids.splice(from, 1);
+      ids.splice(to, 0, fromId);
+      return { ids, active: prev.active };
+    });
+  }, []);
 
   const toggleDone = useCallback((id) => {
     setVisited(prev => {
@@ -457,10 +462,9 @@ export default function ProcessingStudio() {
   }, [userNodes]);
 
   const onCodeChange = useCallback((v) => {
+    if (!activeId) return;
     setBuffers(prev => ({ ...prev, [activeId]: v }));
-    if (activeId === 'playground') {
-      localStorage.setItem(PLAYGROUND_STORAGE_KEY, v);
-    } else if (userNodes[activeId]) {
+    if (userNodes[activeId]) {
       setUserNodes(prev => ({
         ...prev,
         [activeId]: { ...prev[activeId], content: v }
@@ -474,7 +478,9 @@ export default function ProcessingStudio() {
       p5Instance.current.remove();
       p5Instance.current = null;
     }
-    if (!window.p5 || !canvasRef.current) return;
+    // Skip when there's nothing to draw or the preview window is closed —
+    // running a hidden p5 sketch eats CPU / battery for no visible output.
+    if (!hasActive || !canvasOpen || !window.p5 || !canvasRef.current) return;
     try {
       const jsCode = transpile(code);
       let wrapped = jsCode;
@@ -491,7 +497,7 @@ export default function ProcessingStudio() {
       console.error('Sketch error:', err);
       setError(err.message);
     }
-  }, [code]);
+  }, [code, hasActive, canvasOpen]);
 
   useEffect(() => {
     if (runTimerRef.current) clearTimeout(runTimerRef.current);
@@ -501,18 +507,28 @@ export default function ProcessingStudio() {
 
   useEffect(() => () => { if (p5Instance.current) p5Instance.current.remove(); }, []);
 
-  const handleRun = useCallback(() => {
-    if (runningTimerRef.current) clearTimeout(runningTimerRef.current);
-    setRunning(true);
-    runSketch();
-    runningTimerRef.current = setTimeout(() => setRunning(false), 650);
-  }, [runSketch]);
+  // Ctrl/Cmd + W closes the active tab. Ctrl/Cmd + R re-runs the sketch
+  // (matches Processing's own keyboard shortcut).
+  useEffect(() => {
+    const onKey = (e) => {
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && (e.key === 'w' || e.key === 'W')) {
+        if (!tabs.active) return;
+        e.preventDefault();
+        closeTab(tabs.active);
+      } else if (mod && (e.key === 'r' || e.key === 'R')) {
+        if (!hasActive) return;
+        e.preventDefault();
+        runSketch();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tabs.active, closeTab, hasActive, runSketch]);
 
   const resetCurrent = () => {
-    if (isPlayground) {
-      localStorage.removeItem(PLAYGROUND_STORAGE_KEY);
-      setBuffers(prev => ({ ...prev, playground: sketches.playground }));
-    } else if (isUserFile) {
+    if (!hasActive) return;
+    if (isUserFile) {
       // Reset a user file back to the blank template.
       setBuffers(prev => ({ ...prev, [activeId]: BLANK_SKETCH }));
       setUserNodes(prev => ({
@@ -525,6 +541,7 @@ export default function ProcessingStudio() {
   };
 
   const downloadSketch = () => {
+    if (!hasActive) return;
     let slug = activeId || 'sketch';
     if (isUserFile) slug = userNodes[activeId].name.replace(/\.[^.]+$/, '');
     const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
@@ -563,21 +580,32 @@ export default function ProcessingStudio() {
     e.target.value = '';
   };
 
-  const gotoRelative = (delta) => {
-    if (isPlayground || isUserFile) {
+  const gotoRelative = useCallback((delta) => {
+    if (!hasActive || isUserFile) {
       openTab(orderedIds[0]);
       return;
     }
     const idx = orderedIds.indexOf(activeId);
-    if (idx === -1) return;
+    if (idx === -1) {
+      openTab(orderedIds[0]);
+      return;
+    }
     const next = orderedIds[Math.max(0, Math.min(orderedIds.length - 1, idx + delta))];
     openTab(next);
-  };
+  }, [hasActive, isUserFile, activeId, orderedIds, openTab]);
 
   const tabLabelFor = (id) => {
     if (userNodes[id]) return displayFileName(userNodes[id].name);
     return t.sections[id] || id;
   };
+
+  // Title shown in the floating preview window's titlebar — match Processing's
+  // own window naming (filename.pde, or the lesson-derived sketch slug).
+  const canvasTitle = !hasActive
+    ? 'Preview'
+    : isUserFile
+      ? userNodes[activeId].name
+      : `${activeId}.pde`;
 
   return (
     <div style={{
@@ -607,6 +635,8 @@ export default function ProcessingStudio() {
           onDeleteNode={deleteUserNode}
           onRenameNode={renameUserNode}
           onMoveNode={moveUserNode}
+          onPrevLesson={() => gotoRelative(-1)}
+          onNextLesson={() => gotoRelative(+1)}
         />
         {!sidebarCollapsed && (
           <ResizeHandle
@@ -622,11 +652,11 @@ export default function ProcessingStudio() {
             tabs={tabs.ids} activeId={activeId}
             tabLabelFor={tabLabelFor}
             userNodes={userNodes}
-            onFocusTab={focusTab} onCloseTab={closeTab} onNewTab={newTab}
-            onRun={handleRun} onReset={resetCurrent}
+            onFocusTab={focusTab} onCloseTab={closeTab}
+            onReorderTab={reorderTabs}
+            onRun={runSketch} onReset={resetCurrent}
             onDownload={downloadSketch} onUpload={uploadSketch}
-            onPrev={() => gotoRelative(-1)} onNext={() => gotoRelative(+1)}
-            error={error} running={running}
+            error={error}
           />
         </div>
         <ResizeHandle
@@ -636,17 +666,26 @@ export default function ProcessingStudio() {
         <div style={{ width: rightW, flexShrink: 0, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <RightPanel
             t={t} c={c}
-            canvasRef={canvasRef}
             lesson={lesson}
             sectionNum={sectionNum}
             sectionTitle={sectionTitle}
             moduleLabel={moduleLabel}
             overviewCollapsed={overviewCollapsed}
             setOverviewCollapsed={setOverviewCollapsed}
-            showOverview={!isUserFile}
+            showOverview={hasActive && !isUserFile}
+            hasActive={hasActive}
           />
         </div>
       </div>
+      <CanvasWindow
+        c={c}
+        canvasRef={canvasRef}
+        title={canvasTitle}
+        sectionNum={sectionNum}
+        hasActive={hasActive}
+        isOpen={canvasOpen}
+        setIsOpen={setCanvasOpen}
+      />
     </div>
   );
 }
