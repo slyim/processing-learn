@@ -29,7 +29,7 @@ export default function CodeEditor({
   t, c, code, onCodeChange, fontSize,
   tabs, activeId, tabLabelFor, userNodes,
   onFocusTab, onCloseTab, onReorderTab,
-  onRun, onReset, onDownload, onUpload,
+  onRun, onStop, stopped, onReset, onDownload, onUpload,
   error
 }) {
   const fileInputRef = useRef(null);
@@ -98,11 +98,15 @@ export default function CodeEditor({
         }}>{t.editor}</span>
       </div>
 
+      <div style={{
+        display: 'flex', alignItems: 'stretch', flexShrink: 0,
+        borderBottom: `1px solid ${c.border}`,
+        background: c.tabInactive, minWidth: 0
+      }}>
       <div className="editor-tabbar" style={{
         display: 'flex', alignItems: 'stretch',
-        borderBottom: `1px solid ${c.border}`,
         background: c.tabInactive,
-        overflowX: 'auto', flexShrink: 0, height: 38
+        overflowX: 'auto', flex: 1, minWidth: 0, height: 38
       }}>
         {tabs.map(id => {
           const isActive = id === activeId;
@@ -187,32 +191,38 @@ export default function CodeEditor({
             </div>
           );
         })}
-        <div style={{
-          flex: 1, display: 'flex', alignItems: 'center',
-          justifyContent: 'flex-end', padding: '0 8px 0 14px'
-        }}>
-          {hasActive && (
+      </div>
+        {/* Run / Stop are pinned outside the scrolling tab strip so they stay
+            visible no matter how many tabs are open or how narrow the editor
+            gets. Left border separates them from the last tab visually. */}
+        {hasActive && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 2,
+            padding: '0 8px', flexShrink: 0,
+            borderLeft: `1px solid ${c.border}`,
+            background: c.tabInactive
+          }}>
             <button
               onClick={onRun}
-              title={`${t.run} (Ctrl+R)`}
-              aria-label={t.run}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: c.accent, color: '#fff',
-                border: 'none', borderRadius: 5,
-                cursor: 'pointer',
-                padding: '4px 9px', height: 24,
-                boxShadow: `0 1px 4px ${c.accentDim}`,
-                transition: 'filter 0.12s'
-              }}
-              onMouseDown={(e) => { e.currentTarget.style.filter = 'brightness(0.92)'; }}
-              onMouseUp={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}
+              title={`${t.run || 'Run'} (Ctrl+R)`}
+              aria-label={t.run || 'Run'}
+              className="btn-run-icon"
+              style={runIconBtn(c, !stopped)}
             >
-              <Icon name="play-circle" size={13} />
+              <Icon name="play-arrow" size={16} />
             </button>
-          )}
-        </div>
+            <button
+              onClick={onStop}
+              disabled={stopped}
+              title={stopped ? (t.stopped || 'Stopped') : (t.stop || 'Stop sketch')}
+              aria-label={t.stop || 'Stop sketch'}
+              className="btn-run-icon"
+              style={stopIconBtn(c, stopped)}
+            >
+              <Icon name="square" size={13} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div style={{ flex: 1, overflow: 'hidden', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
@@ -317,5 +327,36 @@ function iconBtnStyle(c) {
     transition: 'all 0.15s',
     ['--hover-color']: c.accent,
     ['--hover-border']: c.accentBorder
+  };
+}
+
+// Flat icon-only Run / Stop buttons that live in the editor's tab strip — same
+// vibe as VS Code's run-this-file caret in the top-right. Resting state is
+// already accent-colored so the action reads at a glance, hover bumps to
+// accentHover and adds a soft accentDim halo for tactile feedback.
+function runIconBtn(c, active) {
+  return {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: 'transparent', border: 'none', cursor: 'pointer',
+    width: 28, height: 26, borderRadius: 6,
+    color: active ? c.accent : c.textMuted,
+    transition: 'background 0.12s, color 0.12s, transform 0.12s',
+    ['--hover-bg']: c.accentDim,
+    ['--hover-color']: c.accentHover
+  };
+}
+
+function stopIconBtn(c, disabled) {
+  return {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: 'transparent',
+    border: 'none',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    width: 28, height: 26, borderRadius: 6,
+    color: disabled ? c.textDim : c.textMuted,
+    opacity: disabled ? 0.5 : 1,
+    transition: 'background 0.12s, color 0.12s',
+    ['--hover-bg']: disabled ? 'transparent' : c.accentDim,
+    ['--hover-color']: disabled ? c.textDim : c.accent
   };
 }

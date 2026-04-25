@@ -59,7 +59,6 @@ export default function Header({ theme, setTheme, lang, setLang, t, c }) {
   }, []);
 
   const showSubtitle = width >= 780;
-  const showThemeLabel = width >= 900;
   const showThemeText = width >= 560;            // below this, Dark/Light shrink to icon-only
   const showTitle = width >= 380;                 // below this the title can hide, keeping toggles usable
 
@@ -103,12 +102,6 @@ export default function Header({ theme, setTheme, lang, setLang, t, c }) {
       {!showTitle && <div style={{ flex: 1, minWidth: 0 }} />}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-        {showThemeLabel && (
-          <span style={{
-            fontSize: 10.5, color: c.textMuted,
-            fontFamily: 'Inter, sans-serif', marginRight: 2
-          }}>{t.themeLabel}</span>
-        )}
         <ToggleGroup
           c={c}
           ariaLabel={t.themeLabel}

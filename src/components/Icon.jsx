@@ -22,7 +22,11 @@ const P = {
     </>
   ),
   'globe': (
-    <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,2a8.19,8.19,0,0,1,1.79.21,2.61,2.61,0,0,1-.78,1c-.22.17-.46.31-.7.46a4.56,4.56,0,0,0-1.85,1.67,6.49,6.49,0,0,0-.62,3.3c0,1.36,0,2.16-.95,2.87-1.37,1.07-3.46.47-4.76-.07A8.33,8.33,0,0,1,4,12,8,8,0,0,1,12,4ZM5,15.8a8.42,8.42,0,0,0,2,.27,5,5,0,0,0,3.14-1c1.71-1.34,1.71-3.06,1.71-4.44a4.76,4.76,0,0,1,.37-2.34,2.86,2.86,0,0,1,1.12-.91,9.75,9.75,0,0,0,.92-.61A4.55,4.55,0,0,0,15.66,4.9,8,8,0,0,1,19,8.12c-1.43.2-3.46.67-3.86,2.53A7,7,0,0,0,15,12a2.93,2.93,0,0,1-.29,1.47l-.1.17c-.65,1.08-1.38,2.31-.39,4,.12.21.25.41.38.61a2.29,2.29,0,0,1,.52,1.08A7.89,7.89,0,0,1,12,20,8,8,0,0,1,5,15.8Zm11.93,2.52a6.79,6.79,0,0,0-.63-1.14c-.11-.16-.22-.32-.32-.49-.39-.68-.25-1,.38-2l.1-.17A4.77,4.77,0,0,0,17,12.09a5.42,5.42,0,0,1,.09-1c.16-.73,1.71-.93,2.67-1a7.94,7.94,0,0,1-2.86,8.28Z" />
+    <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <ellipse cx="12" cy="12" rx="4" ry="9" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+    </g>
   ),
   'book-open': (
     <path d="M20.62,4.22a1,1,0,0,0-.84-.2L12,5.77,4.22,4A1,1,0,0,0,3,5V17.2a1,1,0,0,0,.78,1l8,1.8L12,20l.22,0,8-1.8a1,1,0,0,0,.78-1V5A1,1,0,0,0,20.62,4.22ZM5,6.25,11,7.6V17.75L5,16.4ZM19,16.4l-6,1.35V7.6l6-1.35Z" />
@@ -94,6 +98,24 @@ const P = {
       <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" />
       <path d="M15,8a1,1,0,0,0-1,1v6a1,1,0,0,0,2,0V9A1,1,0,0,0,15,8Z" />
       <path d="M9,8A1,1,0,0,0,8,9v6a1,1,0,0,0,2,0V9A1,1,0,0,0,9,8Z" />
+    </>
+  ),
+  'stop-circle': (
+    <>
+      <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" />
+      <rect x="8.5" y="8.5" width="7" height="7" rx="1.2" />
+    </>
+  ),
+  'play-arrow': (
+    <path d="M8,5.14V19a1,1,0,0,0,1.55.83l11-7a1,1,0,0,0,0-1.66l-11-7A1,1,0,0,0,8,5.14ZM10,7,18.16,12,10,17Z" />
+  ),
+  'square': (
+    <rect x="6" y="6" width="12" height="12" rx="1.5" />
+  ),
+  'expand': (
+    <>
+      <path d="M20,3H15a1,1,0,0,0,0,2h2.59L13.29,9.29a1,1,0,1,0,1.42,1.42L19,6.41V9a1,1,0,0,0,2,0V4A1,1,0,0,0,20,3Z" />
+      <path d="M9.29,13.29,5,17.59V15a1,1,0,0,0-2,0v5a1,1,0,0,0,1,1H9a1,1,0,0,0,0-2H6.41l4.3-4.29a1,1,0,1,0-1.42-1.42Z" />
     </>
   ),
   'refresh': (
@@ -170,10 +192,10 @@ export default function Icon({ name, size = 16, title, style, onClick, strokeWid
   );
 }
 
-// Branded blue "P" tile — matches the look of the Processing (.pde) file icon
-// used by the Processing IDE. Rendered as an SVG so it scales cleanly alongside
-// the Eva icons. The color is hard-coded to Processing's signature blue so it
-// reads as "this is a Processing file" regardless of the app theme.
+// Branded orange "P" tile — same silhouette as the Processing IDE's .pde file
+// icon, recolored to the YTÜ Programlama brand orange so it sits with the rest
+// of the studio chrome. Hard-coded to the accent so it reads as a Processing
+// file regardless of theme.
 export function PdeIcon({ size = 14, title }) {
   return (
     <svg
@@ -185,7 +207,7 @@ export function PdeIcon({ size = 14, title }) {
       role={title ? 'img' : undefined}
       style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}
     >
-      <rect x="2" y="2" width="20" height="20" rx="4" fill="#006699" />
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#f97316" />
       <text
         x="12" y="17"
         textAnchor="middle"

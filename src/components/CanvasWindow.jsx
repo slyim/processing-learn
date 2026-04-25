@@ -72,33 +72,23 @@ export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNu
     window.addEventListener('mouseup', onUp);
   }, [isFocused]);
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        title="Show preview"
-        aria-label="Show preview"
-        style={{
-          position: 'fixed', right: 18, bottom: 18, zIndex: 30,
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '8px 14px', borderRadius: 999,
-          background: c.accent, color: '#fff', border: 'none',
-          cursor: 'pointer', boxShadow: c.shadow,
-          fontSize: 12, fontWeight: 600, fontFamily: 'Inter, sans-serif'
-        }}
-      >
-        <Icon name="play-circle" size={13} />
-        Show preview
-      </button>
-    );
-  }
+  // When the preview is closed there's no floating "show preview" pill — the
+  // Run icon at the top of the editor toolbar reopens (and starts) the sketch
+  // in one click, matching the way Processing's own Run button behaves.
+  if (!isOpen) return null;
 
   const wrapperStyle = isFocused
     ? {
+        // Cinema mode: heavy backdrop blur so whatever's behind the sketch
+        // melts away and the canvas feels stage-lit. A soft radial highlight
+        // adds depth without competing with the artwork.
         position: 'fixed', inset: 0, zIndex: 60,
-        background: 'rgba(0,0,0,0.78)',
+        background: 'radial-gradient(120% 80% at 50% 35%, rgba(249,115,22,0.18), rgba(0,0,0,0.78) 65%)',
+        backdropFilter: 'blur(28px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(160%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 32, flexDirection: 'column', gap: 12
+        padding: 32, flexDirection: 'column', gap: 12,
+        animation: 'cinema-fade-in 0.32s ease-out'
       }
     : {
         position: 'fixed', left: pos.x, top: pos.y, zIndex: 40,
@@ -143,12 +133,12 @@ export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNu
         )}
         <button
           onClick={() => setIsFocused(f => !f)}
-          title={isFocused ? 'Exit focus (Esc)' : 'Focus / fill screen'}
-          aria-label={isFocused ? 'Exit focus mode' : 'Enter focus mode'}
+          title={isFocused ? 'Exit cinema (Esc)' : 'Cinema mode'}
+          aria-label={isFocused ? 'Exit cinema mode' : 'Enter cinema mode'}
           className="btn-icon"
           style={titleBtn(c, isFocused)}
         >
-          <Icon name={isFocused ? 'close' : 'play-circle'} size={12} />
+          <Icon name={isFocused ? 'close' : 'expand'} size={12} />
         </button>
         {!isFocused && (
           <button

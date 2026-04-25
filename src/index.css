@@ -34,6 +34,13 @@ body {
 .btn-ghost:hover { border-color: var(--hover-border) !important; }
 .btn-icon:hover { color: var(--hover-color) !important; border-color: var(--hover-border) !important; }
 
+/* Run / Stop icon buttons in the editor tab strip — VS Code style. */
+.btn-run-icon:not(:disabled):hover {
+  background: var(--hover-bg) !important;
+  color: var(--hover-color) !important;
+}
+.btn-run-icon:not(:disabled):active { transform: scale(0.94); }
+
 /* Resize handle highlight on hover */
 .resize-handle:hover { background: var(--hover-bg) !important; }
 
@@ -69,4 +76,16 @@ body {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  /* Cinema mode: a soft glow + subtle frame so the sketch reads as the focal
+     point against the blurred backdrop. */
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(249, 115, 22, 0.20),
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    0 0 120px rgba(249, 115, 22, 0.18);
+}
+
+@keyframes cinema-fade-in {
+  from { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+  to   { opacity: 1; }
 }

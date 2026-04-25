@@ -148,6 +148,9 @@ export default function ProcessingStudio() {
   const [visited, setVisited] = useState(loadSet(VISITED_KEY));
   const [error, setError] = useState(null);
   const [canvasOpen, setCanvasOpen] = useState(() => loadBool(CANVAS_OPEN_KEY, true));
+  // When true, the auto-run effect leaves the sketch alone — used by the Stop
+  // button so a sketch the user paused doesn't restart on every keystroke.
+  const [stopped, setStopped] = useState(false);
 
   const canvasRef = useRef(null);
   const p5Instance = useRef(null);
@@ -499,11 +502,34 @@ export default function ProcessingStudio() {
     }
   }, [code, hasActive, canvasOpen]);
 
+  // User pressed the Stop button — tear down the active sketch, close the
+  // preview window, and pause the auto-run loop so further code edits don't
+  // silently restart it. Run reopens both in one click.
+  const stopSketch = useCallback(() => {
+    if (runTimerRef.current) clearTimeout(runTimerRef.current);
+    if (p5Instance.current) {
+      p5Instance.current.remove();
+      p5Instance.current = null;
+    }
+    setStopped(true);
+    setCanvasOpen(false);
+  }, []);
+
+  // User pressed the Run button — re-arm auto-run and make sure the preview
+  // window is visible. The actual p5 instantiation happens inside the
+  // auto-run effect below, kicked off by `stopped` flipping back to false.
+  const startSketch = useCallback(() => {
+    setStopped(false);
+    if (!canvasOpen) setCanvasOpen(true);
+    else runSketch();
+  }, [canvasOpen, runSketch]);
+
   useEffect(() => {
     if (runTimerRef.current) clearTimeout(runTimerRef.current);
+    if (stopped) return;
     runTimerRef.current = setTimeout(runSketch, 150);
     return () => clearTimeout(runTimerRef.current);
-  }, [runSketch]);
+  }, [runSketch, stopped]);
 
   useEffect(() => () => { if (p5Instance.current) p5Instance.current.remove(); }, []);
 
@@ -519,12 +545,12 @@ export default function ProcessingStudio() {
       } else if (mod && (e.key === 'r' || e.key === 'R')) {
         if (!hasActive) return;
         e.preventDefault();
-        runSketch();
+        startSketch();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [tabs.active, closeTab, hasActive, runSketch]);
+  }, [tabs.active, closeTab, hasActive, startSketch]);
 
   const resetCurrent = () => {
     if (!hasActive) return;
@@ -654,16 +680,24 @@ export default function ProcessingStudio() {
             userNodes={userNodes}
             onFocusTab={focusTab} onCloseTab={closeTab}
             onReorderTab={reorderTabs}
-            onRun={runSketch} onReset={resetCurrent}
+            onRun={startSketch} onStop={stopSketch}
+            stopped={stopped}
+            onReset={resetCurrent}
             onDownload={downloadSketch} onUpload={uploadSketch}
             error={error}
           />
         </div>
-        <ResizeHandle
-          direction="vertical" t={c}
-          onDrag={(delta) => setRightW(w => Math.max(260, Math.min(540, w - delta)))}
-        />
-        <div style={{ width: rightW, flexShrink: 0, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        {!overviewCollapsed && (
+          <ResizeHandle
+            direction="vertical" t={c}
+            onDrag={(delta) => setRightW(w => Math.max(260, Math.min(540, w - delta)))}
+          />
+        )}
+        <div style={{
+          width: overviewCollapsed ? 40 : rightW,
+          flexShrink: 0, display: 'flex', flexDirection: 'column', minWidth: 0,
+          transition: 'width 0.25s'
+        }}>
           <RightPanel
             t={t} c={c}
             lesson={lesson}
