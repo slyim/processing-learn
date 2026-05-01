@@ -215,6 +215,27 @@ void draw() {
   angle += 0.01;
 }`,
 
+  pvector: `PVector pos;
+PVector vel;
+
+void setup() {
+  size(320, 300);
+  pos = new PVector(160, 150);
+  vel = new PVector(2.5, 3.2);
+}
+
+void draw() {
+  background(20);
+  pos.add(vel);
+  
+  if (pos.x < 15 || pos.x > width - 15) vel.x *= -1;
+  if (pos.y < 15 || pos.y > height - 15) vel.y *= -1;
+  
+  fill(255, 122, 26);
+  noStroke();
+  circle(pos.x, pos.y, 30);
+}`,
+
   particles: `let particles = [];
 
 void setup() {
@@ -394,20 +415,37 @@ void draw() {
     fill(255, 255, 255, 40 + t * 60);
     circle(lerp(40, 280, t), 130 + sin(t * TWO_PI) * 40, 20);
   }
+}`,
+
+  threed: `void setup() {
+  size(320, 260, WEBGL);
+}
+
+void draw() {
+  background(20);
+  lights();
+  
+  translate(0, 0, 0);
+  rotateX(frameCount * 0.01);
+  rotateY(frameCount * 0.02);
+  
+  noStroke();
+  fill(255, 122, 26);
+  box(80);
 }`
 };
 
 export const sectionIds = [
   'intro', 'fundamentals', 'colors', 'variables', 'conditionals',
   'loops', 'functions', 'interaction', 'keyboard', 'animation',
-  'transforms', 'particles', 'classes', 'trigonometry', 'noise',
-  'recursion', 'text', 'gradient'
+  'transforms', 'pvector', 'particles', 'classes', 'trigonometry', 'noise',
+  'recursion', 'threed', 'text', 'gradient'
 ];
 
 export const sectionIcons = {
   intro: '🎨', fundamentals: '🔷', colors: '🌈', variables: '📊',
   conditionals: '🔀', loops: '🔄', functions: '🧩', interaction: '🖱️',
-  keyboard: '⌨️', animation: '🎬', transforms: '🌀', particles: '✨',
+  keyboard: '⌨️', animation: '🎬', transforms: '🌀', pvector: '↗️', particles: '✨',
   classes: '📦', trigonometry: '📐', noise: '🌊', recursion: '🌳',
-  text: '🔤', gradient: '🎆'
+  threed: '🧊', text: '🔤', gradient: '🎆'
 };

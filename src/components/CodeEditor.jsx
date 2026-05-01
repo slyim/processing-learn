@@ -73,7 +73,6 @@ export default function CodeEditor({
 
     return [
       java(),
-      EditorView.lineWrapping,
       syntaxHighlighting(buildHighlightStyle(c)),
       editorChrome
     ];

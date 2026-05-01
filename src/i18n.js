@@ -4,8 +4,9 @@ export const modules = [
   { id: 'm2', sectionIds: ['variables', 'conditionals', 'loops', 'functions'] },
   { id: 'm3', sectionIds: ['interaction', 'keyboard'] },
   { id: 'm4', sectionIds: ['animation', 'transforms', 'trigonometry'] },
-  { id: 'm5', sectionIds: ['particles', 'classes', 'noise', 'recursion'] },
-  { id: 'm6', sectionIds: ['text', 'gradient'] }
+  { id: 'm5', sectionIds: ['pvector', 'particles', 'classes'] },
+  { id: 'm6', sectionIds: ['noise', 'recursion', 'threed'] },
+  { id: 'm7', sectionIds: ['text', 'gradient'] }
 ];
 
 // Return "2.3" style number for a lesson section.
@@ -66,8 +67,9 @@ export const translations = {
       m2: 'Logic & Control Flow',
       m3: 'User Input',
       m4: 'Motion & Transformations',
-      m5: 'Systems & Generation',
-      m6: 'Typography & Color'
+      m5: 'Vectors & Systems',
+      m6: 'Advanced Topics',
+      m7: 'Typography & Style'
     },
     sections: {
       playground: 'Blank Sketch',
@@ -83,10 +85,12 @@ export const translations = {
       animation: 'Animation',
       transforms: 'Transformations',
       trigonometry: 'Trigonometry',
+      pvector: 'PVectors',
       particles: 'Arrays & Particles',
       classes: 'Classes (OOP)',
       noise: 'Perlin Noise',
       recursion: 'Recursion & Fractals',
+      threed: '3D Graphics',
       text: 'Text & Typography',
       gradient: 'Gradients'
     },
@@ -223,6 +227,15 @@ export const translations = {
         ],
         tryIt: 'Add a third wave using sin(x * 0.05 + frameCount * 0.03) — an animated wave. Make it draw in a third color.'
       },
+      pvector: {
+        intro: 'PVectors represent points or directions in space. They pack x, y, and z into a single object, with built-in methods for math like add(), sub(), and mult(). They make code cleaner when dealing with physics and movement.',
+        concepts: [
+          'PVector pos = new PVector(x, y); creates a vector.',
+          'pos.add(vel) updates position using a velocity vector.',
+          'PVectors can represent position, velocity, and acceleration.'
+        ],
+        tryIt: 'Change the velocity components or add an acceleration vector that gets added to velocity every frame.'
+      },
       particles: {
         intro: 'Once you have one moving thing, a hundred is almost as easy. An array holds many items; a for loop updates each one per frame. Each particle is a small object with its own position and velocity. Emergent behavior — swarms, fields, flows — starts from this simple recipe.',
         concepts: [
@@ -262,6 +275,15 @@ export const translations = {
           'Small tweaks (angle, shrink factor) transform the output dramatically.'
         ],
         tryIt: 'Change PI/6 to PI/4 for wider branches. Add a third recursive call with a smaller angle to make the tree bushier.'
+      },
+      threed: {
+        intro: 'Processing supports 3D rendering via the WEBGL renderer. Adding a Z-axis allows you to build scenes with depth, lights, and cameras.',
+        concepts: [
+          'size(w, h, WEBGL) enables 3D mode.',
+          'translate(x, y, z) and rotateX() / rotateY() move and orient shapes in 3D.',
+          'lights() adds default shading.'
+        ],
+        tryIt: 'Change box() to sphere() or draw multiple boxes using a loop with varying Z translations.'
       },
       text: {
         intro: 'Text in Processing is drawn, not laid out. text(string, x, y) places a string at a coordinate using the current fill color. textSize sets point size, textAlign controls anchoring. It\'s less like HTML and more like painting letters.',
@@ -322,8 +344,9 @@ export const translations = {
       m2: 'Mantık ve Akış Kontrolü',
       m3: 'Kullanıcı Girişi',
       m4: 'Hareket ve Dönüşümler',
-      m5: 'Sistemler ve Üretim',
-      m6: 'Tipografi ve Renk'
+      m5: 'Vektörler ve Sistemler',
+      m6: 'İleri Konular',
+      m7: 'Tipografi ve Stil'
     },
     sections: {
       playground: 'Boş Çizim',
@@ -339,10 +362,12 @@ export const translations = {
       animation: 'Animasyon',
       transforms: 'Dönüşümler',
       trigonometry: 'Trigonometri',
+      pvector: 'PVectorler',
       particles: 'Diziler ve Parçacıklar',
       classes: 'Sınıflar (OOP)',
       noise: 'Perlin Gürültüsü',
       recursion: 'Özyineleme ve Fraktallar',
+      threed: '3B Grafikler',
       text: 'Metin ve Tipografi',
       gradient: 'Gradyanlar'
     },
@@ -479,6 +504,15 @@ export const translations = {
         ],
         tryIt: 'sin(x * 0.05 + frameCount * 0.03) ile üçüncü bir dalga ekleyin — animasyonlu olacak. Üçüncü bir renkte çizdirin.'
       },
+      pvector: {
+        intro: 'PVectorler uzaydaki noktaları veya yönleri temsil eder. x, y ve z\'yi tek bir nesnede toplarlar ve add(), sub() gibi matematiksel metotlar sunarlar. Fizik ve hareketle uğraşırken kodu çok daha temiz hale getirirler.',
+        concepts: [
+          'PVector pos = new PVector(x, y); bir vektör oluşturur.',
+          'pos.add(vel) hız vektörünü kullanarak konumu günceller.',
+          'PVectorler konum, hız ve ivmeyi temsil edebilir.'
+        ],
+        tryIt: 'Hız bileşenlerini değiştirin veya her karede hıza eklenen bir ivme vektörü ekleyin.'
+      },
       particles: {
         intro: 'Hareket eden bir nesneniz olduğunda, yüz tane de neredeyse aynı kolaylıkta olur. Dizi çok sayıda öğe tutar; her karede bir for döngüsü her birini günceller. Her parçacık kendi konum ve hızına sahip küçük bir nesnedir. Ortaya çıkan davranış — sürü, alan, akış — bu basit tariften başlar.',
         concepts: [
@@ -518,6 +552,15 @@ export const translations = {
           'Küçük değişiklikler (açı, küçültme oranı) çıktıyı çarpıcı biçimde değiştirir.'
         ],
         tryIt: 'PI/6\'yı PI/4 yapıp dalları genişletin. Üçüncü bir özyinelemeli çağrı ekleyerek ağacı gürleştirin.'
+      },
+      threed: {
+        intro: 'Processing, WEBGL işleyicisi aracılığıyla 3B işlemeyi destekler. Z ekseni eklemek derinlik, ışıklar ve kameralar içeren sahneler oluşturmanıza olanak tanır.',
+        concepts: [
+          'size(w, h, WEBGL) 3B modunu etkinleştirir.',
+          'translate(x, y, z) ve rotateX() / rotateY() şekilleri 3B uzayda taşır ve yönlendirir.',
+          'lights() varsayılan gölgelendirmeyi ekler.'
+        ],
+        tryIt: 'box()\'u sphere() ile değiştirin veya farklı Z çevirileri kullanarak bir döngü ile birden çok kutu çizin.'
       },
       text: {
         intro: 'Processing\'te metin yerleştirilmez, çizilir. text(metin, x, y) mevcut dolgu rengiyle verilen koordinata metni koyar. textSize punto boyutunu, textAlign ise hizalamayı belirler. HTML\'den çok, harflerin resmini çizmeye benzer.',
@@ -578,8 +621,9 @@ export const translations = {
       m2: 'Logik & Kontrollfluss',
       m3: 'Benutzereingabe',
       m4: 'Bewegung & Transformationen',
-      m5: 'Systeme & Generierung',
-      m6: 'Typografie & Farbe'
+      m5: 'Vektoren & Systeme',
+      m6: 'Fortgeschrittene Themen',
+      m7: 'Typografie & Stil'
     },
     sections: {
       playground: 'Leere Skizze',
@@ -595,10 +639,12 @@ export const translations = {
       animation: 'Animation',
       transforms: 'Transformationen',
       trigonometry: 'Trigonometrie',
+      pvector: 'PVektoren',
       particles: 'Arrays & Partikel',
       classes: 'Klassen (OOP)',
       noise: 'Perlin-Rauschen',
       recursion: 'Rekursion & Fraktale',
+      threed: '3D-Grafiken',
       text: 'Text & Typografie',
       gradient: 'Farbverläufe'
     },
@@ -735,6 +781,15 @@ export const translations = {
         ],
         tryIt: 'Zusätzliche animierte Welle via sin(x * 0.05 + frameCount * 0.03). Zeichne sie in einer dritten Farbe.'
       },
+      pvector: {
+        intro: 'PVektoren repräsentieren Punkte oder Richtungen im Raum. Sie fassen x, y und z in einem einzigen Objekt zusammen und bieten Methoden für Mathematik wie add(), sub() und mult(). Sie machen Code bei der Arbeit mit Physik und Bewegung viel sauberer.',
+        concepts: [
+          'PVector pos = new PVector(x, y); erstellt einen Vektor.',
+          'pos.add(vel) aktualisiert die Position mithilfe eines Geschwindigkeitsvektors.',
+          'PVektoren können Position, Geschwindigkeit und Beschleunigung darstellen.'
+        ],
+        tryIt: 'Ändere die Geschwindigkeitskomponenten oder füge einen Beschleunigungsvektor hinzu, der in jedem Frame zur Geschwindigkeit addiert wird.'
+      },
       particles: {
         intro: 'Wenn eine Sache sich bewegt, gehen hundert fast genauso leicht. Ein Array hält viele Elemente; eine for-Schleife aktualisiert jedes pro Frame. Jedes Partikel ist ein kleines Objekt mit eigener Position und Geschwindigkeit. Emergentes Verhalten — Schwärme, Felder, Strömungen — startet bei diesem einfachen Rezept.',
         concepts: [
@@ -774,6 +829,15 @@ export const translations = {
           'Kleine Anpassungen (Winkel, Schrumpffaktor) ändern das Ergebnis dramatisch.'
         ],
         tryIt: 'Ändere PI/6 zu PI/4 für breitere Zweige. Dritter rekursiver Aufruf mit kleinerem Winkel → buschigerer Baum.'
+      },
+      threed: {
+        intro: 'Processing unterstützt 3D-Rendering über den WEBGL-Renderer. Durch Hinzufügen einer Z-Achse kannst du Szenen mit Tiefe, Lichtern und Kameras erstellen.',
+        concepts: [
+          'size(w, h, WEBGL) aktiviert den 3D-Modus.',
+          'translate(x, y, z) und rotateX() / rotateY() bewegen und orientieren Formen in 3D.',
+          'lights() fügt Standardbeleuchtung hinzu.'
+        ],
+        tryIt: 'Ersetze box() durch sphere() oder zeichne mehrere Boxen mit einer Schleife und unterschiedlichen Z-Verschiebungen.'
       },
       text: {
         intro: 'Text in Processing wird gezeichnet, nicht gesetzt. text(str, x, y) platziert einen String an einer Koordinate mit der aktuellen Füllfarbe. textSize setzt die Punktgröße, textAlign steuert den Anker. Eher Malen als HTML.',
