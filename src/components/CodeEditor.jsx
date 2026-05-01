@@ -81,7 +81,7 @@ export default function CodeEditor({
   return (
     <div style={{
       flex: 1, display: 'flex', flexDirection: 'column',
-      minWidth: 0, background: c.editorBg
+      minWidth: 0, minHeight: 0, background: c.editorBg
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
