@@ -18,21 +18,16 @@ function loadPos() {
 // matches Processing's own windows where size() in code controls the canvas
 // dimensions.
 export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNum, isOpen, setIsOpen }) {
-  const [pos, setPos] = useState(() => loadPos() || { x: -1, y: 80 });
+  // First mount with no saved position: nudge to top-right corner. Compute
+  // here (lazy initializer) instead of in an effect so we don't trigger a
+  // cascading render — the value is correct on the very first paint.
+  const [pos, setPos] = useState(() => loadPos() || { x: Math.max(20, window.innerWidth - 460), y: 80 });
   const [isFocused, setIsFocused] = useState(false);
   const dragState = useRef(null);
   const containerRef = useRef(null);
 
-  // First mount with no saved position: nudge to top-right corner.
   useEffect(() => {
-    if (pos.x < 0) {
-      const w = window.innerWidth;
-      setPos({ x: Math.max(20, w - 460), y: 80 });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (pos.x >= 0) localStorage.setItem(POS_KEY, JSON.stringify(pos));
+    localStorage.setItem(POS_KEY, JSON.stringify(pos));
   }, [pos]);
 
   // Esc exits focus mode.

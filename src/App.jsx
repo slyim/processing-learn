@@ -670,7 +670,7 @@ export default function ProcessingStudio() {
             onDrag={(delta) => setSidebarW(w => Math.max(210, Math.min(380, w + delta)))}
           />
         )}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
           <CodeEditor
             t={t} c={c}
             code={code} onCodeChange={onCodeChange}
