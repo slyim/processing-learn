@@ -35,7 +35,7 @@ export function transpile(src) {
 
   // 2. Strip primitive cast expressions: `(float) x` -> `x`. Also support
   //    `(int[]) x` for safety, even though Processing learners rarely use it.
-  out = out.replace(new RegExp(`\\((?:${TYPES})(?:\\[\\])?\\)\\s*`, 'g'), '');
+  out = out.replace(new RegExp(`\\((?:${TYPES})(?:\\[\\])*\\)\\s*`, 'g'), '');
 
   // 3. size(w, h) -> createCanvas(w, h); new PVector(...) -> createVector(...)
   //    (p5.js exposes createVector; the PVector class isn't a global.)
@@ -81,7 +81,7 @@ export function transpile(src) {
   //    `function foo(`; indented (class method) drops the type and keeps
   //    bare-method syntax.
   out = out.replace(
-    new RegExp(`(^|\\n)([ \\t]*)(?:${TYPES})(?:\\[\\])?[ \\t]+(\\w+)[ \\t]*\\(`, 'g'),
+    new RegExp(`(^|\\n)([ \\t]*)(?:${TYPES})(?:\\[\\])*[ \\t]+(\\w+)[ \\t]*\\(`, 'g'),
     (_m, lead, indent, name) => indent.length === 0
       ? `${lead}function ${name}(`
       : `${lead}${indent}${name}(`
@@ -91,26 +91,26 @@ export function transpile(src) {
   //    Requires the type be followed by at least one whitespace and an identifier
   //    character — so it won't match `int(x)` (a cast-style Processing call).
   out = out.replace(
-    new RegExp(`(^|\\n)([ \\t]*)(?:${TYPES})(?:\\[\\])?[ \\t]+(?=\\w)`, 'g'),
+    new RegExp(`(^|\\n)([ \\t]*)(?:${TYPES})(?:\\[\\])*[ \\t]+(?=\\w)`, 'g'),
     '$1$2let '
   );
 
   // 10. for-loop init with typed counter: `for (int i = 0; ...)` → `for (let i = 0; ...)`
   out = out.replace(
-    new RegExp(`for\\s*\\(\\s*(?:${TYPES})(?:\\[\\])?\\s+`, 'g'),
+    new RegExp(`for\\s*\\(\\s*(?:${TYPES})(?:\\[\\])*\\s+`, 'g'),
     'for (let '
   );
 
   // 11. Java enhanced for: `for (Type name : list)` → `for (let name of list)`.
   //     Keep the identifier type-agnostic so `for (Ball b : balls)` works too.
-  out = out.replace(/for\s*\(\s*\w+(?:\[\])?\s+(\w+)\s*:\s*/g, 'for (let $1 of ');
+  out = out.replace(/for\s*\(\s*\w+(?:\[\])*\s+(\w+)\s*:\s*/g, 'for (let $1 of ');
 
   // 12. Strip remaining type annotations (function/method parameter types and
   //     stray usage). Word-boundary on the type name so we don't touch
   //     identifiers like `intro`, and a negative lookahead so we don't strip
   //     conversion calls that p5.js actually exposes as functions —
   //     `color(...)`, `int(...)`, `float(...)`, `boolean(...)`.
-  out = out.replace(new RegExp(`\\b(?:${TYPES})\\b(?!\\s*\\()(?:\\[\\])?`, 'g'), '');
+  out = out.replace(new RegExp(`\\b(?:${TYPES})\\b(?!\\s*\\()(?:\\[\\])*`, 'g'), '');
 
   // 13. Clean up whitespace left by stripped types in parameter lists and calls.
   out = out

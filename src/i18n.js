@@ -6,7 +6,20 @@ export const modules = [
   { id: 'm4', sectionIds: ['animation', 'transforms', 'trigonometry'] },
   { id: 'm5', sectionIds: ['pvector', 'particles', 'classes'] },
   { id: 'm6', sectionIds: ['noise', 'recursion', 'threed'] },
-  { id: 'm7', sectionIds: ['text', 'gradient'] }
+  { id: 'm7', sectionIds: ['text', 'gradient'] },
+  { id: 'm8', sectionIds: ['stringBasics', 'stringOps', 'stringFormat'] },
+  { id: 'm9', sectionIds: ['arrays', 'twoDArrays', 'arrayList'] },
+  { id: 'm10', sectionIds: ['mapConstrain', 'lerpEasing', 'mathFuncs'] },
+  { id: 'm11', sectionIds: ['imageBasics', 'imageTint'] },
+  { id: 'm12', sectionIds: ['pixelArray', 'getSet', 'imageFilter'] },
+  { id: 'm13', sectionIds: ['millisTime', 'dateTime'] },
+  { id: 'm14', sectionIds: ['extendsClass', 'polymorphism'] },
+  { id: 'm15', sectionIds: ['vertexShape', 'bezierCurve', 'customShapes'] },
+  { id: 'm16', sectionIds: ['physicsGravity', 'physicsSprings', 'physicsCollision'] },
+  { id: 'm17', sectionIds: ['flowField', 'gridGen', 'lSystems'] },
+  { id: 'm18', sectionIds: ['pgraphics', 'blendModes'] },
+  { id: 'm19', sectionIds: ['saveFrame', 'exportSequence'] },
+  { id: 'm20', sectionIds: ['finalGame', 'finalArt'] }
 ];
 
 // Return "2.3" style number for a lesson section.
@@ -68,8 +81,21 @@ export const translations = {
       m3: 'User Input',
       m4: 'Motion & Transformations',
       m5: 'Vectors & Systems',
-      m6: 'Advanced Topics',
-      m7: 'Typography & Style'
+      m6: 'Generative & Recursive',
+      m7: 'Typography & Style',
+      m8: 'Strings & Text Data',
+      m9: 'Arrays in Depth',
+      m10: 'Math Toolkit',
+      m11: 'Images',
+      m12: 'Pixels & Filters',
+      m13: 'Time & Frames',
+      m14: 'Inheritance & OOP',
+      m15: 'Curves & Custom Shapes',
+      m16: 'Physics Basics',
+      m17: 'Generative Patterns',
+      m18: 'Layers & Buffers',
+      m19: 'Saving & Sharing',
+      m20: 'Final Projects'
     },
     sections: {
       playground: 'Blank Sketch',
@@ -92,7 +118,40 @@ export const translations = {
       recursion: 'Recursion & Fractals',
       threed: '3D Graphics',
       text: 'Text & Typography',
-      gradient: 'Gradients'
+      gradient: 'Gradients',
+      stringBasics: 'String Basics',
+      stringOps: 'String Operations',
+      stringFormat: 'Formatting & Parsing',
+      arrays: 'Array Basics',
+      twoDArrays: '2D Arrays',
+      arrayList: 'Dynamic Arrays',
+      mapConstrain: 'Map & Constrain',
+      lerpEasing: 'Lerp & Easing',
+      mathFuncs: 'Math Functions',
+      imageBasics: 'Loading Images',
+      imageTint: 'Tint & Color',
+      pixelArray: 'Pixel Array',
+      getSet: 'get() & set()',
+      imageFilter: 'Filters',
+      millisTime: 'Time with millis()',
+      dateTime: 'Date & Clock',
+      extendsClass: 'Inheritance',
+      polymorphism: 'Polymorphism',
+      vertexShape: 'vertex() Shapes',
+      bezierCurve: 'Bezier Curves',
+      customShapes: 'Custom Shapes',
+      physicsGravity: 'Gravity & Bounce',
+      physicsSprings: 'Springs',
+      physicsCollision: 'Collisions',
+      flowField: 'Flow Fields',
+      gridGen: 'Grid Generation',
+      lSystems: 'L-Systems',
+      pgraphics: 'Off-Screen Buffers',
+      blendModes: 'Blend Modes',
+      saveFrame: 'Saving Images',
+      exportSequence: 'Frame Sequences',
+      finalGame: 'Mini Game',
+      finalArt: 'Generative Art'
     },
     lessons: {
       playground: {
@@ -304,6 +363,339 @@ export const translations = {
           'Layering translucent circles over a gradient creates depth and atmosphere.'
         ],
         tryIt: 'Change the gradient from vertical to diagonal — use (x + y) / (width + height) as your t. Swap the colors for sunset tones.'
+      },
+      stringBasics: {
+        intro: 'A String is a sequence of characters in quotes. In Processing it\'s declared with String, and most operations match Java: charAt(i) reads a character, toUpperCase() / toLowerCase() change case. In this transpiled environment you read length as a property (.length) instead of a method.',
+        concepts: [
+          'String name = "text"; declares and initializes a string.',
+          'name.length is the character count (JS-style; Java uses name.length()).',
+          'name.charAt(i) returns the character at index i.',
+          'name.toUpperCase() and name.toLowerCase() return new strings — originals are immutable.'
+        ],
+        tryIt: 'Declare a String of your name. Print its length, first character, and reversed version (split + reverse + join).'
+      },
+      stringOps: {
+        intro: 'Strings combine with + (concatenation) and offer methods to slice, search, and replace. substring(a, b) returns the part from index a up to (but not including) b. indexOf returns the position of a substring or -1 if missing. replace swaps occurrences.',
+        concepts: [
+          'a + b joins two strings into a new one.',
+          'str.substring(start, end) — end is exclusive.',
+          'str.indexOf(sub) returns the position, or -1 if not found.',
+          'str.replace(old, new) swaps occurrences.',
+          'str.split(sep) returns an array of pieces.'
+        ],
+        tryIt: 'Take a sentence, split it into words, and draw each word on its own line.'
+      },
+      stringFormat: {
+        intro: 'Sometimes you need numbers as strings or vice versa. Processing\'s nf() formats floats with a fixed number of digits. hex() returns a hex string. int() and float() parse a string into a number — handy for cleaning user input.',
+        concepts: [
+          'nf(value, digits, decimals) pads with zeros and trims decimals.',
+          'hex(255) → "FF". Useful for color codes.',
+          'int("17") → 17. float("2.5") → 2.5.',
+          'Concatenating with "" forces a toString call: "" + 42 → "42".'
+        ],
+        tryIt: 'Display the current frameCount as a 6-digit string with leading zeros — use nf(frameCount, 6).'
+      },
+      arrays: {
+        intro: 'Arrays hold a fixed number of values of the same type. Declare them with int[] or float[] and allocate with new int[N]. Access elements with [i] (zero-indexed) and use .length to get the count. They\'re your bread and butter for working with many values at once.',
+        concepts: [
+          'int[] heights = new int[10]; allocates 10 zeros.',
+          'heights[i] reads or writes the value at index i.',
+          'heights.length tells you how many elements.',
+          'Indices run from 0 to length - 1. Going outside is an error.'
+        ],
+        tryIt: 'Replace random heights with sin-based heights so the array forms a wave: heights[i] = 120 + sin(i * 0.5) * 70.'
+      },
+      twoDArrays: {
+        intro: 'A 2D array represents a grid: rows and columns. Java declares it as int[][] grid; here we use a JavaScript-style nested array — same shape. Access with grid[x][y]. Useful for tile maps, cellular automata, image grids, and chess boards.',
+        concepts: [
+          'grid[x][y] addresses cell (x, y) — two indices.',
+          'Initialize with nested loops over both dimensions.',
+          'Useful for tile maps, cellular automata, image grids.',
+          'Memory grows quadratically: a 100x100 grid is 10,000 cells.'
+        ],
+        tryIt: 'Use noise(x * 0.1, y * 0.1) instead of random for cell colors. The result is smooth and coherent rather than static-y.'
+      },
+      arrayList: {
+        intro: 'Java\'s ArrayList holds a variable-length list — items in, items out, length changes. JavaScript arrays already work this way: push adds, pop removes, splice deletes by index. The transpiler treats arrays this way out of the box.',
+        concepts: [
+          'arr.push(item) appends to the end.',
+          'arr.pop() removes and returns the last item.',
+          'arr.length grows automatically.',
+          'arr.splice(i, 1) removes the item at index i.'
+        ],
+        tryIt: 'Add a keyPressed handler that calls words.pop() — clicking adds, key removes. Watch the list grow and shrink.'
+      },
+      mapConstrain: {
+        intro: 'map() rescales a number from one range to another — the most useful function in creative coding. constrain() clamps a number to a min and max so it never goes out of range. Combined, they translate user input into visual properties cleanly.',
+        concepts: [
+          'map(value, in_min, in_max, out_min, out_max) — proportional rescaling.',
+          'constrain(value, min, max) clamps to the range.',
+          'map can extrapolate (go past out_min/out_max). Wrap with constrain to prevent that.',
+          'They compose well: constrain(map(...), low, high).'
+        ],
+        tryIt: 'Map mouseY to fill alpha (0..255) and constrain to keep things visible (50..255). What changes when you remove the constrain?'
+      },
+      lerpEasing: {
+        intro: 'Linear interpolation (lerp) blends between two values. lerp(a, b, t) returns a when t=0 and b when t=1. Calling lerp every frame with a small t produces smooth easing — the value approaches the target instead of snapping to it. Easing makes interfaces feel alive.',
+        concepts: [
+          'lerp(a, b, t) — t in [0, 1].',
+          'Easing pattern: x = lerp(x, target, 0.1) every frame.',
+          'Smaller t = slower ease. 0.5 is snappy, 0.02 is sluggish.',
+          'lerpColor(c1, c2, t) interpolates colors directly.'
+        ],
+        tryIt: 'Replace 0.08 with 0.3 for snappy, or 0.02 for sluggish. Try lerping y to mouseY too so the ball follows the cursor smoothly.'
+      },
+      mathFuncs: {
+        intro: 'Processing exposes the same math functions you\'d find in any language: abs, sqrt, pow, floor, ceil, round, min, max, dist. They take and return numbers, with no special Processing flavor — pure utilities you reach for constantly.',
+        concepts: [
+          'abs(x) — absolute value (always non-negative).',
+          'sqrt(x), pow(x, n) — square root and exponent.',
+          'floor(x), ceil(x), round(x) — integer conversions.',
+          'dist(x1, y1, x2, y2) — euclidean distance between two points.',
+          'min(a, b), max(a, b) — pick the smaller / larger.'
+        ],
+        tryIt: 'Write a function inside(x, y, cx, cy, r) that returns true if (x, y) is inside a circle. Use it to highlight a circle when the mouse is over it.'
+      },
+      imageBasics: {
+        intro: 'Images are loaded with loadImage(url) in setup() and drawn with image(img, x, y). loadImage needs a real URL or path — for local files you place them in a data/ folder. This learning sandbox doesn\'t fetch images, so we simulate the look with primitives, but the API is identical.',
+        concepts: [
+          'PImage img = loadImage("path/to/image.png"); — load once, in setup.',
+          'image(img, x, y) draws at the top-left corner (x, y).',
+          'image(img, x, y, w, h) draws the image scaled.',
+          'img.width and img.height tell you its dimensions.'
+        ],
+        tryIt: 'In a real Processing sketch, drop a PNG into the sketch folder and call loadImage. Draw it at the mouse position so it follows the cursor.'
+      },
+      imageTint: {
+        intro: 'tint() recolors images as you draw them — every pixel\'s RGB is multiplied by the tint color. tint(255, 0, 0) makes everything red, tint(255, 100) sets transparency to ~40%. Call noTint() to disable.',
+        concepts: [
+          'tint(r, g, b) multiplies each channel.',
+          'tint(gray, alpha) for monochrome and transparency.',
+          'noTint() returns to normal drawing.',
+          'Layering tinted copies of one image gives halftone and split-tone effects.'
+        ],
+        tryIt: 'Tint an image multiple times in a row, each at a different position and tint color, for a halftone or chromatic-aberration effect.'
+      },
+      pixelArray: {
+        intro: 'loadPixels() copies the canvas into the pixels[] array. Each pixel takes 4 entries: R, G, B, A. After modifying, call updatePixels() to write back. This is how you build images one pixel at a time — perfect for shaders, mosaics, and effects.',
+        concepts: [
+          'loadPixels() refreshes the pixels[] array with current canvas state.',
+          'pixels[(x + y * width) * 4 + 0] is the red channel of pixel (x, y).',
+          '+1 = green, +2 = blue, +3 = alpha. Each pixel is 4 bytes.',
+          'updatePixels() pushes the modified buffer back to the canvas.'
+        ],
+        tryIt: 'Replace the linear gradient with sin-based stripes: use sin(x * 0.1) * 127 + 128 as the red channel.'
+      },
+      getSet: {
+        intro: 'set(x, y, color) writes a single pixel. get(x, y) reads one. They\'re slower than pixels[] for bulk work but more readable for small operations. set() doesn\'t need updatePixels() — it pushes immediately.',
+        concepts: [
+          'set(x, y, color(r, g, b)) sets one pixel.',
+          'get(x, y) returns the color at (x, y).',
+          'For loops over many pixels, use pixels[] instead — set() is per-call slow.',
+          'You can mix get/set with regular drawing for hybrid effects.'
+        ],
+        tryIt: 'Use get(mouseX, mouseY) to sample the color under the cursor and use it as the new fill for circles drawn around it.'
+      },
+      imageFilter: {
+        intro: 'filter() applies a built-in transformation to the entire canvas. BLUR softens, GRAY desaturates, INVERT flips colors, THRESHOLD binarizes. Each takes an optional parameter for strength. Filters happen after drawing — call them last.',
+        concepts: [
+          'filter(BLUR, radius) — Gaussian blur.',
+          'filter(GRAY) — desaturate to grayscale.',
+          'filter(INVERT) — color negative.',
+          'filter(THRESHOLD, level) — high-contrast black & white.'
+        ],
+        tryIt: 'Apply BLUR, then GRAY, then INVERT in sequence. Swap their order — the result is different. Why?'
+      },
+      millisTime: {
+        intro: 'millis() returns the number of milliseconds since the sketch started. It\'s the most precise way to time events independent of frameRate. While frameCount counts frames, millis counts wall-clock time.',
+        concepts: [
+          'millis() / 1000.0 — seconds elapsed.',
+          'Use it as input to sin/cos for time-based animation that runs at the same rate regardless of FPS.',
+          'Compare millis() to a stored startTime for elapsed durations.',
+          'Reset by storing a new "epoch" — Processing doesn\'t restart millis itself.'
+        ],
+        tryIt: 'Trigger an action when millis() crosses 5000 — flash the canvas, log a message, or change the color.'
+      },
+      dateTime: {
+        intro: 'Processing exposes the system clock: year(), month(), day(), hour(), minute(), second(). Each returns the current value as a number. Combine with text() to build clocks, calendars, and date-aware animations.',
+        concepts: [
+          'hour() returns 0-23, minute() and second() return 0-59.',
+          'year() / month() / day() return calendar values (month is 1-12).',
+          'These read fresh on each call — they update as time passes.',
+          'Combine with nf() to format with leading zeros: nf(minute(), 2).'
+        ],
+        tryIt: 'Make the canvas color cycle through seasons by mapping month() to a hue between 0-360.'
+      },
+      extendsClass: {
+        intro: 'A class can extend another, inheriting its fields and methods. The child uses super() to call the parent\'s constructor. Inheritance lets you share behavior across related types — Shape might define position; Circle and Square extend it with their own draw.',
+        concepts: [
+          'class Child extends Parent { ... } — declares inheritance.',
+          'super(args) calls the parent constructor.',
+          'Inherited methods can be overridden by redefining in the child.',
+          'Use inheritance for "is-a" relationships, composition for "has-a".'
+        ],
+        tryIt: 'Add a Square class that extends Shape with a side length. Draw squares mixed in with bubbles in the same loop.'
+      },
+      polymorphism: {
+        intro: 'Polymorphism: same method name, different behavior depending on the object\'s actual type. A list of Animals can hold Dogs and Cats; calling speak() on each gives different output without any if-checks. The basis of strategy patterns and plugin architectures.',
+        concepts: [
+          'Define a method on the parent. Override it in each child.',
+          'Calling the method on a parent-typed reference dispatches to the actual subclass.',
+          'Cleaner than long if/else chains checking the type.',
+          'The basis of strategy patterns and plugin architectures.'
+        ],
+        tryIt: 'Add a Bird class that returns "tweet". Push some birds into the array — the loop works unchanged.'
+      },
+      vertexShape: {
+        intro: 'Custom polygons are built with beginShape(), several vertex(x, y) calls, and endShape(CLOSE). The CLOSE flag joins the last vertex back to the first. Add as many vertices as you like — Processing connects them in order.',
+        concepts: [
+          'beginShape() and endShape(CLOSE) frame the polygon.',
+          'vertex(x, y) adds a corner.',
+          'stroke() and fill() before beginShape control the styling.',
+          'beginShape(POINTS), beginShape(LINES), beginShape(TRIANGLES) — render modes.'
+        ],
+        tryIt: 'Build a star by alternating vertices on two radii (small and big) around a circle. The result is a classic 5-point star.'
+      },
+      bezierCurve: {
+        intro: 'Bezier curves are smooth curves defined by anchor points and control points. bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2) draws a cubic curve from (x1, y1) to (x2, y2) bent toward the two control points. The control points pull the curve without lying on it.',
+        concepts: [
+          'bezier() draws a cubic curve with two control points.',
+          'curveVertex() defines a Catmull-Rom-like spline through points.',
+          'Anchor points are start/end. Control points shape the bend.',
+          'Used for SVG-style paths, organic shapes, and motion paths.'
+        ],
+        tryIt: 'Animate the control points with sin/cos to make the curve breathe. Tie the anchors to the canvas corners.'
+      },
+      customShapes: {
+        intro: 'Combine vertex(), trig, and parameters to write reusable shape functions. drawCog(cx, cy, r, teeth) takes a center, radius, and tooth count, then iterates around a circle alternating between two radii. The same idea generates stars, sun rays, and gear teeth.',
+        concepts: [
+          'Wrap shape logic in a function so the same call draws different sizes.',
+          'Loop angle from 0 to TWO_PI to walk a circle.',
+          'Alternate radii in the loop to create teeth, jags, or stars.',
+          'A second pass can add inner details (a hole, an inset).'
+        ],
+        tryIt: 'Add an angle parameter and rotate the cog by frameCount * 0.01. Place several gears side by side so they appear to mesh.'
+      },
+      physicsGravity: {
+        intro: 'The simplest physics engine has three actors: position, velocity, acceleration. Each frame, vel += acc and pos += vel. An acceleration of (0, 0.2) is gravity — velocity increases downward over time. Bouncing flips the y velocity sign with some energy lost.',
+        concepts: [
+          'pos += vel; vel += acc; — Euler integration.',
+          'Gravity is a constant downward acceleration vector.',
+          'Bounce: when out of bounds, flip vel and multiply by a coefficient < 1 (energy loss).',
+          'PVector wraps these vectors into clean object methods.'
+        ],
+        tryIt: 'Add wind by setting acc.x to a small non-zero value. Add air resistance by multiplying vel by 0.99 each frame.'
+      },
+      physicsSprings: {
+        intro: 'A spring pulls an object toward a rest position with force proportional to displacement. Hooke\'s law: F = -k * (x - rest). Add damping (multiply velocity by ~0.95) so the oscillation eventually settles.',
+        concepts: [
+          'force = -k * (x - rest), where k is stiffness.',
+          'velocity += force; velocity *= damping; position += velocity.',
+          'Without damping, the spring oscillates forever.',
+          'k and damping are both knobs — adjust to taste.'
+        ],
+        tryIt: 'Try k = 0.2 (very stiff) vs 0.01 (loose). Try damping = 1 (perpetual motion) vs 0.85 (quick stop).'
+      },
+      physicsCollision: {
+        intro: 'Pairwise collision: for every pair of balls, check if their distance is less than the sum of their radii. If so, they overlap — swap velocities for a basic elastic response. This is O(n²) and breaks down for many objects, but is fine for dozens.',
+        concepts: [
+          'dist(a.pos.x, a.pos.y, b.pos.x, b.pos.y) < a.r + b.r → collision.',
+          'Swap velocities for a quick (lossy) response.',
+          'Real elastic collision uses vectors and mass — this is a visual approximation.',
+          'Spatial partitioning (grids, quad trees) speeds up many objects.'
+        ],
+        tryIt: 'Increase to 30 balls and watch the FPS drop. Cut to 6 and color them by ID so you can see which pair collided.'
+      },
+      flowField: {
+        intro: 'A flow field maps each point in space to a direction. Using noise() for the angle gives organic, drifting motion. Particles step in the direction of their local field — the result resembles wind, currents, or smoke.',
+        concepts: [
+          'angle = noise(x * scale, y * scale) * TWO_PI * n. n controls how many "swirls".',
+          'Step each particle by (cos(angle), sin(angle)) * speed.',
+          'Adding frameCount as a third noise dimension makes the field evolve over time.',
+          'Low alpha leaves trails — the impression of streamlines.'
+        ],
+        tryIt: 'Replace random points with persistent particles. Each particle steps along the field; reset it when it leaves the canvas.'
+      },
+      gridGen: {
+        intro: 'Generative art often starts with a grid. Iterate cells; for each cell, decide whether to draw and how — based on noise, position, or randomness. The grid gives structure; the per-cell logic gives variety.',
+        concepts: [
+          'Two nested loops walk the grid.',
+          'noise(x * scale, y * scale) gives a smooth value per cell — coherent neighbors.',
+          'Threshold the noise to make cells appear or disappear.',
+          'Vary fill, rotation, or sub-shape per cell for endless variations.'
+        ],
+        tryIt: 'Replace the rect with a circle whose radius is the noise value. Make the canvas sparser by raising the threshold from 0.5 to 0.7.'
+      },
+      lSystems: {
+        intro: 'L-systems generate strings by repeatedly applying replacement rules to an axiom. Interpreting each character as a turtle command — F = forward, + = turn right, - = turn left — produces fractal-like shapes after a few iterations.',
+        concepts: [
+          'Start with an axiom (a single string).',
+          'Apply rules: each char gets replaced by another string.',
+          'After N iterations, the string can be very long.',
+          'Interpret with a turtle: forward, left, right, push, pop.'
+        ],
+        tryIt: 'Add the rule "F → F-F+F" instead. Try 5 iterations. Add [ and ] for branching to grow trees.'
+      },
+      pgraphics: {
+        intro: 'createGraphics(w, h) creates an off-screen canvas you can draw into independently. It supports the same drawing API. Once you\'ve drawn, image(pg, 0, 0) blits it onto the main canvas. Use it for caching, layering, and post-processing.',
+        concepts: [
+          'PGraphics pg = createGraphics(w, h); — create a buffer.',
+          'In real Processing call pg.beginDraw() / pg.endDraw(); p5.js doesn\'t need it.',
+          'pg.clear(), pg.fill(), pg.rect() — same API, prefixed.',
+          'Drawing once into a buffer is faster than rebuilding every frame.'
+        ],
+        tryIt: 'Draw a slow background pattern into the buffer once. In draw(), blit the buffer plus a moving foreground shape.'
+      },
+      blendModes: {
+        intro: 'blendMode() changes how new pixels combine with existing ones. ADD lights up; black turns to colored. MULTIPLY darkens. SCREEN brightens but preserves brights. Reset with blendMode(BLEND).',
+        concepts: [
+          'BLEND — default alpha compositing.',
+          'ADD — sums RGB; great for glow.',
+          'MULTIPLY — multiplies RGB; great for shadows and tints.',
+          'SCREEN — inverse of multiply; great for highlights.',
+          'DIFFERENCE / EXCLUSION — psychedelic results.'
+        ],
+        tryIt: 'Switch to MULTIPLY between drawing each circle. Compare with ADD. The same shapes look completely different under each mode.'
+      },
+      saveFrame: {
+        intro: 'save() writes the current canvas to a file. saveFrame() does the same and supports auto-numbering. In real Processing they save to disk; in p5.js the browser triggers a download. Either way, this is how you export final art.',
+        concepts: [
+          'save("image.png") writes a single image.',
+          'saveFrame("seq-####.png") auto-numbers with frameCount.',
+          'PNG preserves transparency; JPG flattens it.',
+          'Call from a key/mouse handler to capture on demand.'
+        ],
+        tryIt: 'Add a keyPressed that saves the current canvas. Use a name that includes hour() and minute() so each save has a unique filename.'
+      },
+      exportSequence: {
+        intro: 'Animations export as a sequence of frames. saveFrame("name-####.png") writes one PNG per frame. Stitch them into MP4 or GIF with a tool like ffmpeg — Processing itself doesn\'t write video.',
+        concepts: [
+          'saveFrame("out-####") — #### becomes the zero-padded frame number.',
+          'Cap frameRate to keep the sequence at a target duration.',
+          'Don\'t export every run — save only when triggered, or you fill the disk.',
+          'External tools: ffmpeg, ImageMagick, online GIF makers.'
+        ],
+        tryIt: 'Set a frame budget — for example, 60 frames at 8 fps = a 7.5s loop. Save until that count, then noLoop().'
+      },
+      finalGame: {
+        intro: 'Combine input, animation, classes, and arrays into a small game. The player follows the mouse; bullets fall from the sky. State lives in vectors and arrays; behavior in update + draw. Once you\'ve internalized this loop, you can build any 2D game.',
+        concepts: [
+          'Position the player based on input each frame.',
+          'Spawn obstacles on a timer (frameCount % N).',
+          'Update each obstacle, draw it, then check collisions.',
+          'Game over: stop spawning, draw "you lose", call noLoop().'
+        ],
+        tryIt: 'Add a score that increases each frame. End the game when a bullet hits the player. Show the score on game over.'
+      },
+      finalArt: {
+        intro: 'Generative art is the goal of most Processing learners. Here\'s a starting recipe: a circle of points whose positions oscillate over time, painted with low alpha so trails build up. Tweaking constants gives endless variations — change a number, run, react, repeat.',
+        concepts: [
+          'A loop over points addressed by an angle around a circle.',
+          'Time as input: frameCount * 0.02 grows continuously.',
+          'Low-alpha fills layer over time, building soft, painterly textures.',
+          'Two parameters (count, frequency) often give interesting results.'
+        ],
+        tryIt: 'Replace the circle layout with a Lissajous figure: x = cos(a * 3 + t), y = sin(a * 2 + t). Try different frequency ratios (3:2, 5:4).'
       }
     }
   },
@@ -345,8 +737,21 @@ export const translations = {
       m3: 'Kullanıcı Girişi',
       m4: 'Hareket ve Dönüşümler',
       m5: 'Vektörler ve Sistemler',
-      m6: 'İleri Konular',
-      m7: 'Tipografi ve Stil'
+      m6: 'Üretken ve Özyinelemeli',
+      m7: 'Tipografi ve Stil',
+      m8: 'Metin Verileri',
+      m9: 'Diziler Derinlemesine',
+      m10: 'Matematik Araçları',
+      m11: 'Görseller',
+      m12: 'Pikseller ve Filtreler',
+      m13: 'Zaman ve Kareler',
+      m14: 'Kalıtım ve OOP',
+      m15: 'Eğriler ve Özel Şekiller',
+      m16: 'Fizik Temelleri',
+      m17: 'Üretken Desenler',
+      m18: 'Katmanlar ve Tamponlar',
+      m19: 'Kaydetme ve Paylaşma',
+      m20: 'Bitirme Projeleri'
     },
     sections: {
       playground: 'Boş Çizim',
@@ -369,7 +774,40 @@ export const translations = {
       recursion: 'Özyineleme ve Fraktallar',
       threed: '3B Grafikler',
       text: 'Metin ve Tipografi',
-      gradient: 'Gradyanlar'
+      gradient: 'Gradyanlar',
+      stringBasics: 'String Temelleri',
+      stringOps: 'String İşlemleri',
+      stringFormat: 'Biçimleme ve Ayrıştırma',
+      arrays: 'Dizi Temelleri',
+      twoDArrays: '2B Diziler',
+      arrayList: 'Dinamik Diziler',
+      mapConstrain: 'map ve constrain',
+      lerpEasing: 'Lerp ve Yumuşama',
+      mathFuncs: 'Matematik Fonksiyonları',
+      imageBasics: 'Görsel Yükleme',
+      imageTint: 'Tint ve Renk',
+      pixelArray: 'Piksel Dizisi',
+      getSet: 'get() ve set()',
+      imageFilter: 'Filtreler',
+      millisTime: 'millis() ile Zaman',
+      dateTime: 'Tarih ve Saat',
+      extendsClass: 'Kalıtım',
+      polymorphism: 'Çok Biçimlilik',
+      vertexShape: 'vertex() Şekilleri',
+      bezierCurve: 'Bezier Eğrileri',
+      customShapes: 'Özel Şekiller',
+      physicsGravity: 'Yerçekimi ve Sekme',
+      physicsSprings: 'Yaylar',
+      physicsCollision: 'Çarpışmalar',
+      flowField: 'Akış Alanları',
+      gridGen: 'Izgara Üretimi',
+      lSystems: 'L-Sistemleri',
+      pgraphics: 'Ekran Dışı Tamponlar',
+      blendModes: 'Karışım Modları',
+      saveFrame: 'Görsel Kaydetme',
+      exportSequence: 'Kare Dizileri',
+      finalGame: 'Mini Oyun',
+      finalArt: 'Üretken Sanat'
     },
     lessons: {
       playground: {
@@ -581,6 +1019,339 @@ export const translations = {
           'Gradyan üzerine yarı saydam daireler katmanlamak derinlik ve atmosfer yaratır.'
         ],
         tryIt: 'Gradyanı dikeyden çaprazlamasına değiştirin — t olarak (x + y) / (width + height) kullanın. Renkleri günbatımı tonlarına çevirin.'
+      },
+      stringBasics: {
+        intro: 'String, tırnak içine alınmış karakter dizisidir. Processing\'te String ile tanımlanır ve çoğu işlem Java\'ya benzer: charAt(i) bir karakteri okur, toUpperCase()/toLowerCase() büyük/küçük harf çevirir. Bu transpile edilmiş ortamda uzunluk, metot değil özelliktir (.length).',
+        concepts: [
+          'String ad = "metin"; bir string tanımlar ve başlatır.',
+          'ad.length karakter sayısıdır (JS tarzı; Java\'da ad.length()).',
+          'ad.charAt(i) i indeksindeki karakteri döndürür.',
+          'ad.toUpperCase() ve ad.toLowerCase() yeni stringler döndürür — orijinaller değişmez.'
+        ],
+        tryIt: 'Adınızla bir String tanımlayın. Uzunluğunu, ilk karakterini ve ters çevrilmiş halini ekrana çizdirin.'
+      },
+      stringOps: {
+        intro: 'String\'ler + ile birleşir ve dilimleme, arama, değiştirme metotları sunar. substring(a, b) a indeksinden b\'ye (b dahil değil) parçayı verir. indexOf konum döner ya da -1. replace eşleşmeleri değiştirir.',
+        concepts: [
+          'a + b iki stringi yeni bir stringte birleştirir.',
+          'str.substring(başla, bit) — bit dahil değil.',
+          'str.indexOf(alt) konumu döner; bulamazsa -1.',
+          'str.replace(eski, yeni) eşleşmeleri değiştirir.',
+          'str.split(ayraç) parçaları dizi olarak döndürür.'
+        ],
+        tryIt: 'Bir cümleyi alın, kelimelere bölün ve her kelimeyi ayrı satırda çizin.'
+      },
+      stringFormat: {
+        intro: 'Bazen sayıları string\'e ya da tersi gerekir. Processing\'in nf() fonksiyonu float\'ları sabit basamakla biçimler. hex() onaltılık döndürür. int() ve float() string\'i sayıya çevirir.',
+        concepts: [
+          'nf(değer, basamak, ondalık) sıfırlarla doldurup ondalığı kırpar.',
+          'hex(255) → "FF". Renk kodları için kullanışlı.',
+          'int("17") → 17. float("2.5") → 2.5.',
+          '"" + sayı string\'e zorlar: "" + 42 → "42".'
+        ],
+        tryIt: 'frameCount\'u 6 basamaklı bir string olarak gösterin — nf(frameCount, 6) kullanın.'
+      },
+      arrays: {
+        intro: 'Diziler, aynı tipte sabit sayıda değer tutar. int[] veya float[] ile tanımlanır, new int[N] ile ayrılır. Elemanlara [i] ile (sıfırdan başlar), eleman sayısına .length ile erişilir. Çok değerle çalışmanın temel aracıdır.',
+        concepts: [
+          'int[] yükseklikler = new int[10]; 10 sıfır ayırır.',
+          'yükseklikler[i] i indeksindeki değeri okur veya yazar.',
+          'yükseklikler.length toplam eleman sayısıdır.',
+          'İndisler 0\'dan length-1\'e kadardır. Dışına çıkmak hatadır.'
+        ],
+        tryIt: 'Rastgele yükseklikleri sin tabanlı yapın — bir dalga oluşsun: yükseklikler[i] = 120 + sin(i * 0.5) * 70.'
+      },
+      twoDArrays: {
+        intro: '2B dizi bir ızgarayı temsil eder: satırlar ve sütunlar. Java\'da int[][] grid; burada JavaScript stili iç içe dizi kullanırız — aynı şey. grid[x][y] ile erişilir. Karo haritaları, hücresel otomatlar, görsel ızgaraları için kullanışlı.',
+        concepts: [
+          'grid[x][y] hücreyi (x, y) adresler — iki indis.',
+          'İç içe iki döngüyle iki boyutu da gezin.',
+          'Karo haritaları, otomatlar, satranç tahtaları için ideal.',
+          'Bellek karesel büyür: 100x100 ızgara 10.000 hücredir.'
+        ],
+        tryIt: 'Hücre rengini random yerine noise(x * 0.1, y * 0.1) ile yapın. Sonuç pürüzsüz olur, statik değil.'
+      },
+      arrayList: {
+        intro: 'Java\'nın ArrayList\'i değişken uzunlukta liste tutar. JavaScript dizileri zaten böyle çalışır: push ekler, pop çıkarır, splice indise göre siler. Transpiler dizileri bu şekilde işler.',
+        concepts: [
+          'arr.push(öğe) sona ekler.',
+          'arr.pop() son öğeyi çıkarır ve döndürür.',
+          'arr.length otomatik olarak büyür.',
+          'arr.splice(i, 1) i indeksindeki öğeyi siler.'
+        ],
+        tryIt: 'words.pop() çağıran bir keyPressed ekleyin — tıklama ekler, tuş çıkarır.'
+      },
+      mapConstrain: {
+        intro: 'map() bir sayıyı bir aralıktan başkasına ölçekler — yaratıcı kodlamanın en kullanışlı fonksiyonu. constrain() bir sayıyı min ve maks ile sıkıştırır. Birlikte, kullanıcı girdisini görsel özelliklere temiz şekilde çevirir.',
+        concepts: [
+          'map(değer, in_min, in_max, out_min, out_max) — orantılı yeniden ölçek.',
+          'constrain(değer, min, maks) aralığa sıkıştırır.',
+          'map çıkış sınırlarını aşabilir — constrain ile sarın.',
+          'İyi bestelenir: constrain(map(...), alt, üst).'
+        ],
+        tryIt: 'mouseY\'yi alpha\'ya (0..255) eşleyin, görünür kalsın diye 50..255 ile constrain\'leyin.'
+      },
+      lerpEasing: {
+        intro: 'Doğrusal enterpolasyon (lerp) iki değer arasında karışım yapar. lerp(a, b, t) t=0\'da a, t=1\'de b döner. Her karede küçük t ile çağırmak yumuşak ease üretir — değer hedefe yaklaşır, sıçramaz.',
+        concepts: [
+          'lerp(a, b, t) — t [0, 1] aralığında.',
+          'Ease deseni: x = lerp(x, hedef, 0.1) her karede.',
+          'Küçük t = yavaş ease. 0.5 hızlı, 0.02 ağır.',
+          'lerpColor(c1, c2, t) renkleri doğrudan karıştırır.'
+        ],
+        tryIt: '0.08\'i 0.3 yapın (canlı) ya da 0.02 (yavaş). y\'yi de mouseY\'ye lerp\'leyerek imleci pürüzsüzce takip edin.'
+      },
+      mathFuncs: {
+        intro: 'Processing herhangi bir dilde bulacağınız matematik fonksiyonlarını sunar: abs, sqrt, pow, floor, ceil, round, min, max, dist. Sayı alır, sayı döndürür — Processing\'e özel bir lezzet yok, sürekli kullanacağınız araçlar.',
+        concepts: [
+          'abs(x) — mutlak değer (her zaman ≥ 0).',
+          'sqrt(x), pow(x, n) — karekök ve üs.',
+          'floor(x), ceil(x), round(x) — tamsayıya çevirme.',
+          'dist(x1, y1, x2, y2) — iki nokta arası uzaklık.',
+          'min(a, b), max(a, b) — küçük / büyük olanı seçer.'
+        ],
+        tryIt: 'inside(x, y, cx, cy, r) fonksiyonu yazın — daire içindeyse true döner. Üzerinden geçince daireyi vurgulayın.'
+      },
+      imageBasics: {
+        intro: 'Görseller setup() içinde loadImage(url) ile yüklenir, image(img, x, y) ile çizilir. loadImage gerçek bir URL ister — yerel dosyalar için data/ klasörünü kullanın. Bu öğretici ortamda primitive\'lerle simüle ediyoruz, API aynı.',
+        concepts: [
+          'PImage img = loadImage("yol/dosya.png"); — setup\'ta bir kez.',
+          'image(img, x, y) sol üst köşeye çizer.',
+          'image(img, x, y, g, y) ölçekleyerek çizer.',
+          'img.width ve img.height boyutları verir.'
+        ],
+        tryIt: 'Gerçek bir Processing skecinde bir PNG\'yi sketch klasörüne atın ve loadImage ile yükleyin. Fareyi takip etsin.'
+      },
+      imageTint: {
+        intro: 'tint() çizilen görselleri yeniden renklendirir — her piksel verilen renkle çarpılır. tint(255, 0, 0) her şeyi kırmızılaştırır, tint(255, 100) saydamlığı %40\'a düşürür. Kapatmak için noTint().',
+        concepts: [
+          'tint(r, g, b) her kanalı çarpar.',
+          'tint(gri, alpha) tek tonlu ve şeffaflık için.',
+          'noTint() normal çizime döndürür.',
+          'Aynı görseli farklı renklerle katmanlamak halftone etkisi verir.'
+        ],
+        tryIt: 'Bir görseli arka arkaya farklı konum ve renkle birden çok kez tint\'leyin — kromatik aberasyon etkisi.'
+      },
+      pixelArray: {
+        intro: 'loadPixels() tuvali pixels[] dizisine kopyalar. Her piksel 4 girişten oluşur: R, G, B, A. Değiştirdikten sonra updatePixels() çağırarak geri yazın. Görselleri tek piksel düzeyinde inşa etmenin yolu — shader\'lar, mozaikler, efektler için.',
+        concepts: [
+          'loadPixels() pixels[]\'i mevcut tuvalden tazeler.',
+          'pixels[(x + y * width) * 4 + 0] (x, y) pikselinin kırmızı kanalı.',
+          '+1 yeşil, +2 mavi, +3 alpha. Her piksel 4 bayt.',
+          'updatePixels() değişiklikleri tuvale yazar.'
+        ],
+        tryIt: 'Doğrusal gradyanı sin tabanlı şeritlerle değiştirin: kırmızı kanal sin(x * 0.1) * 127 + 128.'
+      },
+      getSet: {
+        intro: 'set(x, y, renk) tek bir piksel yazar. get(x, y) bir piksel okur. pixels[]\'den yavaştır ama küçük işler için daha okunaklıdır. set() updatePixels() istemez — anında uygular.',
+        concepts: [
+          'set(x, y, color(r, g, b)) tek piksel ayarlar.',
+          'get(x, y) (x, y) konumundaki rengi döndürür.',
+          'Çok sayıda piksel için pixels[] daha hızlıdır.',
+          'get/set normal çizimle karışık kullanılabilir.'
+        ],
+        tryIt: 'get(mouseX, mouseY) ile imlecin altındaki rengi örnekleyin, etrafına o renkle daireler çizin.'
+      },
+      imageFilter: {
+        intro: 'filter() tüm tuvale yerleşik bir dönüşüm uygular. BLUR yumuşatır, GRAY griye çevirir, INVERT renkleri ters çevirir, THRESHOLD ikilik yapar. Her birinin gücü için isteğe bağlı parametre.',
+        concepts: [
+          'filter(BLUR, yarıçap) — Gauss bulanıklığı.',
+          'filter(GRAY) — gri tona indir.',
+          'filter(INVERT) — renk negatifi.',
+          'filter(THRESHOLD, seviye) — yüksek kontrast siyah-beyaz.'
+        ],
+        tryIt: 'Sırasıyla BLUR, GRAY, INVERT uygulayın. Sıralarını değiştirin — sonuç farklı olur. Neden?'
+      },
+      millisTime: {
+        intro: 'millis() sketch başladığından beri geçen milisaniyeyi döndürür. frameRate\'den bağımsız zamanlama için en hassas yöntem. frameCount kareleri sayar; millis duvar saatini.',
+        concepts: [
+          'millis() / 1000.0 — geçen saniye.',
+          'sin/cos\'a girdi olarak verirseniz FPS\'den bağımsız zaman tabanlı animasyon üretir.',
+          'startTime saklayıp millis() ile karşılaştırarak süre hesabı yapın.',
+          'Sıfırlama: yeni bir "epoch" saklayın — Processing millis\'i kendi başına sıfırlamaz.'
+        ],
+        tryIt: 'millis() 5000\'i geçince bir aksiyon tetikleyin — tuvali yakın, log basın, renk değiştirin.'
+      },
+      dateTime: {
+        intro: 'Processing sistem saatine erişir: year(), month(), day(), hour(), minute(), second(). Her biri o anki değeri sayı olarak döndürür. text() ile birleşince saatler, takvimler ve zaman duyarlı animasyonlar elde edersiniz.',
+        concepts: [
+          'hour() 0-23, minute() ve second() 0-59 döndürür.',
+          'year() / month() / day() takvim değerleri (ay 1-12).',
+          'Her çağrı taze okur — zaman geçtikçe güncellenir.',
+          'nf() ile sıfır ekleyerek biçimleyin: nf(minute(), 2).'
+        ],
+        tryIt: 'month()\'u 0-360 hue aralığına eşleyerek tuvali mevsimlerden geçirin.'
+      },
+      extendsClass: {
+        intro: 'Bir sınıf başkasından kalıtım alır, alanlarını ve metotlarını miras alır. Çocuk super() ile ebeveynin yapıcısını çağırır. Kalıtım, ilişkili tipler arasında davranış paylaşmanı sağlar — Shape konum verir; Circle/Square kendi draw\'larıyla genişletir.',
+        concepts: [
+          'class Çocuk extends Ebeveyn { ... } — kalıtım tanımlar.',
+          'super(args) ebeveyn yapıcıyı çağırır.',
+          'Miras alınan metotlar çocukta yeniden tanımlanarak override edilir.',
+          '"-dir" ilişkisi için kalıtım, "-i var" için kompozisyon.'
+        ],
+        tryIt: 'Shape\'i extend eden bir Square sınıfı ekleyin (kenar uzunluğu). Aynı döngüde balonlarla karışık çizin.'
+      },
+      polymorphism: {
+        intro: 'Çok biçimlilik: aynı metot adı, nesnenin gerçek tipine göre farklı davranış. Bir Animal listesi Dog ve Cat tutabilir; her birinde speak() farklı çıktı verir, tip kontrolü yapmadan. Strateji desenleri ve eklenti mimarilerinin temeli.',
+        concepts: [
+          'Metodu ebeveynde tanımla, çocuklarda override et.',
+          'Ebeveyn referansta çağrı, gerçek alt sınıfa dispatch edilir.',
+          'Tip kontrol eden uzun if/else zincirlerinden temiz.',
+          'Strateji desenleri ve eklenti mimarilerinin temeli.'
+        ],
+        tryIt: '"tweet" döndüren bir Bird sınıfı ekleyin. Diziye birkaç bird push edin — döngü değişmeden çalışır.'
+      },
+      vertexShape: {
+        intro: 'Özel çokgenler beginShape(), birkaç vertex(x, y) ve endShape(CLOSE) ile yapılır. CLOSE bayrağı son vertex\'i ilkine bağlar. İstediğiniz kadar vertex ekleyin — Processing sırayla bağlar.',
+        concepts: [
+          'beginShape() ve endShape(CLOSE) çokgeni çerçeveler.',
+          'vertex(x, y) bir köşe ekler.',
+          'beginShape\'den önce stroke() ve fill() ile stil belirleyin.',
+          'beginShape(POINTS), beginShape(LINES), beginShape(TRIANGLES) — çizim modları.'
+        ],
+        tryIt: 'İki yarıçap (küçük ve büyük) etrafında dönerek bir yıldız yapın. Klasik 5 köşeli yıldız çıkar.'
+      },
+      bezierCurve: {
+        intro: 'Bezier eğrileri çapa ve kontrol noktalarıyla tanımlanan pürüzsüz eğrilerdir. bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2) iki kontrol noktasına bükülmüş kübik bir eğri çizer. Kontrol noktaları eğride yer almaz, çekerler.',
+        concepts: [
+          'bezier() iki kontrol noktalı kübik eğri çizer.',
+          'curveVertex() noktalardan geçen Catmull-Rom benzeri spline.',
+          'Çapa noktaları başlangıç/bitiş; kontrol noktaları bükümü şekillendirir.',
+          'SVG yolları, organik şekiller ve hareket yolları için.'
+        ],
+        tryIt: 'Kontrol noktalarını sin/cos ile animasyonlayın — eğri nefes alır gibi olur.'
+      },
+      customShapes: {
+        intro: 'vertex(), trig ve parametreleri birleştirerek yeniden kullanılabilir şekil fonksiyonları yazın. drawCog(cx, cy, r, diş) merkez, yarıçap ve diş sayısını alır, bir daire etrafında iki yarıçap arasında geçiş yapar. Aynı fikir yıldızlar ve güneş ışınlarını da üretir.',
+        concepts: [
+          'Şekil mantığını fonksiyona sarın — aynı çağrı farklı boyutta çizer.',
+          'Açıyı 0\'dan TWO_PI\'ye sürükleyerek bir daireyi gezin.',
+          'Döngüde iki yarıçap arasında geçiş yapmak diş, çentik, yıldız üretir.',
+          'İkinci geçiş iç detay (delik, gömme) ekleyebilir.'
+        ],
+        tryIt: 'Açı parametresi ekleyip frameCount * 0.01 ile dönelim. Birden çok dişliyi yan yana koyun, birbirine geçer gibi görünsün.'
+      },
+      physicsGravity: {
+        intro: 'En basit fizik motoru: konum, hız, ivme. Her karede vel += acc, sonra pos += vel. (0, 0.2) ivmesi yerçekimidir — hız zamanla aşağı doğru artar. Sekme y hızının işaretini ters çevirir, biraz enerji kaybeder.',
+        concepts: [
+          'pos += vel; vel += acc; — Euler entegrasyonu.',
+          'Yerçekimi sürekli aşağı bir ivme vektörüdür.',
+          'Sekme: sınır dışında vel\'i ters çevirip < 1 katsayıyla çarp (enerji kaybı).',
+          'PVector bu vektörleri temiz nesne metotlarına sarar.'
+        ],
+        tryIt: 'acc.x\'i küçük bir değere koyarak rüzgar ekleyin. Her karede vel\'i 0.99 ile çarparak hava sürtünmesi ekleyin.'
+      },
+      physicsSprings: {
+        intro: 'Yay nesnesini, dinlenme konumuna doğru deplasmanla orantılı kuvvetle çeker. Hooke yasası: F = -k * (x - rest). Sönümleme (hızı ~0.95 ile çarp) eklerseniz salınım eninde sonunda durur.',
+        concepts: [
+          'force = -k * (x - rest), k sertlik.',
+          'velocity += force; velocity *= sönümleme; position += velocity.',
+          'Sönümleme yoksa yay sonsuza dek salınır.',
+          'k ve sönümleme birer ayar — zevkinize göre değiştirin.'
+        ],
+        tryIt: 'k = 0.2 (çok sert) vs 0.01 (gevşek) deneyin. damping = 1 (sürekli) vs 0.85 (hızlı durur).'
+      },
+      physicsCollision: {
+        intro: 'İkili çarpışma: her top çifti için uzaklık yarıçaplar toplamından küçükse çakışırlar — basit elastik tepki için hızlarını takas edin. O(n²)\'dir, çok nesnede yavaşlar ama düzinelerce için yeterli.',
+        concepts: [
+          'dist(a.pos.x, a.pos.y, b.pos.x, b.pos.y) < a.r + b.r → çarpışma.',
+          'Hızları takas etmek hızlı (kayıplı) yanıttır.',
+          'Gerçek elastik çarpışma vektör ve kütle kullanır — bu görsel yaklaşımdır.',
+          'Çok nesne için uzamsal bölümleme (ızgara, quad tree).'
+        ],
+        tryIt: '30 topa çıkın ve FPS\'in düştüğüne bakın. 6\'ya düşürüp ID\'leri renklendirin, hangi çiftin çarpıştığını görün.'
+      },
+      flowField: {
+        intro: 'Akış alanı her noktayı bir yöne eşler. Açıyı noise() ile üretmek organik, sürüklenen hareket verir. Parçacıklar yerel alanın yönünde adım atar — sonuç rüzgarı, akıntıyı, dumanı andırır.',
+        concepts: [
+          'açı = noise(x * ölçek, y * ölçek) * TWO_PI * n. n "girdap" sayısını belirler.',
+          'Her parçacığı (cos(açı), sin(açı)) * hız ile adımlayın.',
+          'Üçüncü gürültü boyutu olarak frameCount alanı zamanla geliştirir.',
+          'Düşük alpha iz bırakır — akış çizgileri görünür.'
+        ],
+        tryIt: 'Rastgele noktaları kalıcı parçacıklarla değiştirin. Her parçacık alan boyunca yürüsün; tuvalden çıkınca sıfırlansın.'
+      },
+      gridGen: {
+        intro: 'Üretken sanat çoğu zaman bir ızgarayla başlar. Hücreleri dolaşın; her hücre için noise, konum veya rastgele temelli karar verin. Izgara yapı, hücre mantığı çeşitlilik sağlar.',
+        concepts: [
+          'İç içe iki döngü ızgarayı gezer.',
+          'noise(x * ölçek, y * ölçek) hücre başına yumuşak değer — komşular tutarlı.',
+          'Eşik uygulayarak hücreleri görünür/görünmez yapın.',
+          'Aynı ızgaradan farklı görselleştirmeler: dolgu, döndürme, alt-şekil…'
+        ],
+        tryIt: 'rect yerine yarıçapı noise olan circle çizin. Eşiği 0.5\'ten 0.7\'ye çıkararak tuvali seyrekleştirin.'
+      },
+      lSystems: {
+        intro: 'L-sistemleri bir aksiyom üzerine yer değiştirme kuralları uygulayarak string üretir. Her karakteri turtle komutu olarak yorumlayınca — F = ileri, + = sağa dön, - = sola dön — birkaç iterasyonda fraktal benzeri şekiller çıkar.',
+        concepts: [
+          'Bir aksiyom (tek bir string) ile başlayın.',
+          'Kuralları uygulayın: her karakter başka bir stringe dönüşür.',
+          'N iterasyon sonra string çok uzayabilir.',
+          'Turtle ile yorumlayın: ileri, sol, sağ, push, pop.'
+        ],
+        tryIt: '"F → F-F+F" kuralını deneyin. 5 iterasyon yapın. Dallanma için [ ve ] ekleyip ağaç yetiştirin.'
+      },
+      pgraphics: {
+        intro: 'createGraphics(g, y) ekran dışında bağımsız çizebileceğiniz bir tuval oluşturur. Aynı çizim API\'sini destekler. Çizdikten sonra image(pg, 0, 0) ile ana tuvale aktarırsınız. Önbellekleme, katmanlama ve son işlem için kullanılır.',
+        concepts: [
+          'PGraphics pg = createGraphics(g, y); — tampon oluştur.',
+          'Gerçek Processing\'de pg.beginDraw() / pg.endDraw() çağrılır; p5.js\'de gerek yok.',
+          'pg.clear(), pg.fill(), pg.rect() — aynı API, önek ile.',
+          'Bir kere tampona çizmek her kare yeniden çizmekten hızlıdır.'
+        ],
+        tryIt: 'Tampona bir kere yavaş bir arka plan deseni çizin. draw()\'da onu ve hareket eden bir nesneyi birlikte gösterin.'
+      },
+      blendModes: {
+        intro: 'blendMode() yeni piksellerin var olanlarla nasıl karışacağını değiştirir. ADD aydınlatır; siyah renkliye döner. MULTIPLY karartır. SCREEN aydınlatır ama parlakları korur. blendMode(BLEND) ile sıfırlayın.',
+        concepts: [
+          'BLEND — varsayılan alpha kompozisyon.',
+          'ADD — RGB toplar; parlama için ideal.',
+          'MULTIPLY — RGB çarpar; gölge ve ton için.',
+          'SCREEN — multiply\'ın tersi; vurgu için.',
+          'DIFFERENCE / EXCLUSION — psikedelik sonuçlar.'
+        ],
+        tryIt: 'Her daire arasında MULTIPLY\'a geçin. ADD ile karşılaştırın. Aynı şekiller mod altında tamamen farklı görünür.'
+      },
+      saveFrame: {
+        intro: 'save() o anki tuvali bir dosyaya yazar. saveFrame() aynısını yapar ve otomatik numaralandırma destekler. Gerçek Processing diske kaydeder; p5.js\'de tarayıcı indirme tetikler. Son sanatınızı dışa aktarmanın yolu.',
+        concepts: [
+          'save("görsel.png") tek bir görsel yazar.',
+          'saveFrame("seq-####.png") frameCount ile otomatik numaralandırır.',
+          'PNG saydamlığı korur; JPG düzleştirir.',
+          'Tuş/fare olayından çağırın, isteğe bağlı kayıt için.'
+        ],
+        tryIt: 'keyPressed ekleyip mevcut tuvali kaydedin. Dosya adına hour() ve minute() ekleyin — her kayıt benzersiz olsun.'
+      },
+      exportSequence: {
+        intro: 'Animasyonlar kare dizisi olarak dışa aktarılır. saveFrame("ad-####.png") her kareye bir PNG yazar. ffmpeg gibi bir araçla MP4 ya da GIF\'e bağlayın — Processing tek başına video yazmaz.',
+        concepts: [
+          'saveFrame("out-####") — #### sıfır dolgulu kare numarası.',
+          'frameRate\'i hedef süreye göre sınırlayın.',
+          'Her çalıştırmada dışa aktarmayın — diski doldurmamak için tetikli olarak kaydedin.',
+          'Dış araçlar: ffmpeg, ImageMagick, çevrimiçi GIF üreticileri.'
+        ],
+        tryIt: 'Bir kare bütçesi belirleyin — örn. 60 kare 8 fps\'te 7.5 sn döngü. O sayıya kadar kaydedip noLoop().'
+      },
+      finalGame: {
+        intro: 'Girdi, animasyon, sınıflar ve dizileri küçük bir oyunda birleştirin. Oyuncu fareyi takip eder; mermiler gökten düşer. Durum vektör ve dizilerde, davranış update + draw\'da. Bu döngüyü içselleştirince istediğiniz 2D oyunu yapabilirsiniz.',
+        concepts: [
+          'Oyuncuyu her karede girdiyle konumlandırın.',
+          'Engelleri zamanlayıcıyla doğurun (frameCount % N).',
+          'Her engeli güncelle, çiz, çarpışmayı kontrol et.',
+          'Oyun sonu: doğurmayı durdur, "kaybettin" yaz, noLoop().'
+        ],
+        tryIt: 'Her kare artan bir skor ekleyin. Mermi oyuncuya çarpınca oyunu bitirin ve skoru gösterin.'
+      },
+      finalArt: {
+        intro: 'Üretken sanat çoğu Processing öğrencisinin hedefidir. Başlangıç tarifi: zamanla salınan, açı bazlı bir nokta dizisi; düşük alpha ile katman katman izler. Sabitleri değiştirip tepkiyi izleyerek sonsuz varyasyon üretirsiniz.',
+        concepts: [
+          'Bir daire etrafında açıyla adreslenen noktalarda döngü.',
+          'Zaman girdisi: frameCount * 0.02 sürekli büyür.',
+          'Düşük alpha katmanları yumuşak, resimsi dokular kurar.',
+          'İki parametre (sayı, frekans) çoğu zaman ilginç sonuçlar verir.'
+        ],
+        tryIt: 'Daire düzenini Lissajous figürüyle değiştirin: x = cos(a * 3 + t), y = sin(a * 2 + t). Farklı oranlar deneyin (3:2, 5:4).'
       }
     }
   },
@@ -622,8 +1393,21 @@ export const translations = {
       m3: 'Benutzereingabe',
       m4: 'Bewegung & Transformationen',
       m5: 'Vektoren & Systeme',
-      m6: 'Fortgeschrittene Themen',
-      m7: 'Typografie & Stil'
+      m6: 'Generativ & Rekursiv',
+      m7: 'Typografie & Stil',
+      m8: 'Zeichenketten',
+      m9: 'Arrays vertieft',
+      m10: 'Mathe-Werkzeuge',
+      m11: 'Bilder',
+      m12: 'Pixel & Filter',
+      m13: 'Zeit & Frames',
+      m14: 'Vererbung & OOP',
+      m15: 'Kurven & Eigene Formen',
+      m16: 'Physik-Grundlagen',
+      m17: 'Generative Muster',
+      m18: 'Schichten & Buffer',
+      m19: 'Speichern & Teilen',
+      m20: 'Abschlussprojekte'
     },
     sections: {
       playground: 'Leere Skizze',
@@ -646,7 +1430,40 @@ export const translations = {
       recursion: 'Rekursion & Fraktale',
       threed: '3D-Grafiken',
       text: 'Text & Typografie',
-      gradient: 'Farbverläufe'
+      gradient: 'Farbverläufe',
+      stringBasics: 'String-Grundlagen',
+      stringOps: 'String-Operationen',
+      stringFormat: 'Formatierung & Parsen',
+      arrays: 'Array-Grundlagen',
+      twoDArrays: '2D-Arrays',
+      arrayList: 'Dynamische Arrays',
+      mapConstrain: 'map & constrain',
+      lerpEasing: 'Lerp & Easing',
+      mathFuncs: 'Mathe-Funktionen',
+      imageBasics: 'Bilder laden',
+      imageTint: 'Tint & Farbe',
+      pixelArray: 'Pixel-Array',
+      getSet: 'get() & set()',
+      imageFilter: 'Filter',
+      millisTime: 'Zeit mit millis()',
+      dateTime: 'Datum & Uhr',
+      extendsClass: 'Vererbung',
+      polymorphism: 'Polymorphismus',
+      vertexShape: 'vertex()-Formen',
+      bezierCurve: 'Bezier-Kurven',
+      customShapes: 'Eigene Formen',
+      physicsGravity: 'Schwerkraft & Sprung',
+      physicsSprings: 'Federn',
+      physicsCollision: 'Kollisionen',
+      flowField: 'Flussfelder',
+      gridGen: 'Raster-Generierung',
+      lSystems: 'L-Systeme',
+      pgraphics: 'Off-Screen-Buffer',
+      blendModes: 'Mischmodi',
+      saveFrame: 'Bilder speichern',
+      exportSequence: 'Frame-Sequenzen',
+      finalGame: 'Mini-Spiel',
+      finalArt: 'Generative Kunst'
     },
     lessons: {
       playground: {
@@ -858,6 +1675,339 @@ export const translations = {
           'Halbtransparente Kreise über dem Verlauf schaffen Tiefe und Atmosphäre.'
         ],
         tryIt: 'Mach den Verlauf diagonal — nimm (x + y) / (width + height) als t. Tausche die Farben gegen Sonnenuntergangstöne.'
+      },
+      stringBasics: {
+        intro: 'Ein String ist eine Zeichenfolge in Anführungszeichen. In Processing wird er mit String deklariert; die meisten Operationen entsprechen Java: charAt(i) liefert ein Zeichen, toUpperCase()/toLowerCase() ändern die Schreibweise. In dieser transpilierten Umgebung ist die Länge eine Eigenschaft (.length).',
+        concepts: [
+          'String name = "text"; deklariert und initialisiert einen String.',
+          'name.length ist die Zeichenanzahl (JS-Stil; Java: name.length()).',
+          'name.charAt(i) liefert das Zeichen am Index i.',
+          'name.toUpperCase() und name.toLowerCase() liefern neue Strings — Originale sind unveränderlich.'
+        ],
+        tryIt: 'Deklariere einen String mit deinem Namen. Gib Länge, erstes Zeichen und die umgekehrte Form aus (split + reverse + join).'
+      },
+      stringOps: {
+        intro: 'Strings verbinden sich mit + (Konkatenation) und bieten Methoden zum Schneiden, Suchen, Ersetzen. substring(a, b) liefert den Teil von Index a bis (ausschließlich) b. indexOf liefert die Position oder -1, wenn nicht vorhanden.',
+        concepts: [
+          'a + b verbindet zwei Strings zu einem neuen.',
+          'str.substring(start, end) — end ist exklusiv.',
+          'str.indexOf(sub) — Position, sonst -1.',
+          'str.replace(alt, neu) ersetzt Vorkommen.',
+          'str.split(trenn) liefert ein Array von Teilen.'
+        ],
+        tryIt: 'Nimm einen Satz, splitte ihn in Wörter und zeichne jedes Wort in einer eigenen Zeile.'
+      },
+      stringFormat: {
+        intro: 'Manchmal brauchst du Zahlen als Strings oder umgekehrt. nf() formatiert Floats mit fester Anzahl Stellen. hex() liefert einen Hex-String. int() und float() parsen einen String zur Zahl.',
+        concepts: [
+          'nf(wert, stellen, dezimal) füllt mit Nullen und schneidet Nachkommastellen.',
+          'hex(255) → "FF". Praktisch für Farb-Codes.',
+          'int("17") → 17. float("2.5") → 2.5.',
+          '"" + zahl erzwingt toString: "" + 42 → "42".'
+        ],
+        tryIt: 'Zeige frameCount als 6-stelligen String mit führenden Nullen — nf(frameCount, 6).'
+      },
+      arrays: {
+        intro: 'Arrays halten eine feste Anzahl Werte gleichen Typs. Deklariere mit int[] oder float[] und allokiere mit new int[N]. Zugriff per [i] (nullbasiert), Anzahl per .length. Das Brot-und-Butter-Werkzeug für viele Werte.',
+        concepts: [
+          'int[] höhen = new int[10]; reserviert 10 Nullen.',
+          'höhen[i] liest oder schreibt den Wert am Index i.',
+          'höhen.length sagt dir die Anzahl der Elemente.',
+          'Indizes laufen von 0 bis length - 1. Außerhalb ist ein Fehler.'
+        ],
+        tryIt: 'Ersetze Zufallshöhen durch sin-basierte Höhen, sodass das Array eine Welle bildet: höhen[i] = 120 + sin(i * 0.5) * 70.'
+      },
+      twoDArrays: {
+        intro: 'Ein 2D-Array repräsentiert ein Raster: Zeilen und Spalten. In Java schreibt man int[][] grid; hier nutzen wir ein verschachteltes JS-Array — gleiche Form. Zugriff über grid[x][y]. Nützlich für Tiles, zelluläre Automaten, Bildraster.',
+        concepts: [
+          'grid[x][y] adressiert Zelle (x, y) — zwei Indizes.',
+          'Mit verschachtelten Schleifen über beide Dimensionen initialisieren.',
+          'Geeignet für Tile-Maps, zelluläre Automaten, Schachbretter.',
+          'Speicherbedarf wächst quadratisch: ein 100x100-Raster sind 10 000 Zellen.'
+        ],
+        tryIt: 'Nutze noise(x * 0.1, y * 0.1) statt random für Zellfarben. Das Ergebnis wird glatt statt verrauscht.'
+      },
+      arrayList: {
+        intro: 'Java\'s ArrayList hält eine variabel lange Liste. JavaScript-Arrays funktionieren bereits so: push fügt hinzu, pop entfernt, splice löscht per Index. Der Transpiler behandelt Arrays so direkt.',
+        concepts: [
+          'arr.push(item) hängt am Ende an.',
+          'arr.pop() entfernt und liefert das letzte Element.',
+          'arr.length wächst automatisch.',
+          'arr.splice(i, 1) entfernt das Element bei Index i.'
+        ],
+        tryIt: 'Füge einen keyPressed hinzu, der words.pop() aufruft — Klick fügt hinzu, Taste entfernt.'
+      },
+      mapConstrain: {
+        intro: 'map() skaliert eine Zahl von einem Bereich in einen anderen — die nützlichste Funktion im kreativen Coden. constrain() klemmt eine Zahl auf min..max. Zusammen verwandeln sie Eingaben sauber in visuelle Eigenschaften.',
+        concepts: [
+          'map(wert, in_min, in_max, out_min, out_max) — proportionale Umskalierung.',
+          'constrain(wert, min, max) — auf den Bereich klemmen.',
+          'map kann extrapolieren (out_min/out_max überschreiten). Mit constrain umfassen.',
+          'Komponieren gut: constrain(map(...), low, high).'
+        ],
+        tryIt: 'Map mouseY auf alpha (0..255) und constrain auf 50..255, damit alles sichtbar bleibt.'
+      },
+      lerpEasing: {
+        intro: 'Lineare Interpolation (lerp) mischt zwei Werte. lerp(a, b, t) liefert a bei t=0 und b bei t=1. Mit kleinem t pro Frame entsteht weiches Easing — der Wert nähert sich dem Ziel, statt zu springen. Easing macht Interfaces lebendig.',
+        concepts: [
+          'lerp(a, b, t) — t in [0, 1].',
+          'Easing-Muster: x = lerp(x, ziel, 0.1) jedes Frame.',
+          'Kleineres t = langsameres Easing. 0.5 schnell, 0.02 träge.',
+          'lerpColor(c1, c2, t) interpoliert Farben direkt.'
+        ],
+        tryIt: 'Ersetze 0.08 durch 0.3 (knackig) oder 0.02 (träge). Lerpe auch y zur mouseY.'
+      },
+      mathFuncs: {
+        intro: 'Processing bietet die Mathematik-Funktionen jeder Sprache: abs, sqrt, pow, floor, ceil, round, min, max, dist. Reine Werkzeuge ohne Processing-spezifische Eigenheiten — du nutzt sie ständig.',
+        concepts: [
+          'abs(x) — Betrag (immer ≥ 0).',
+          'sqrt(x), pow(x, n) — Wurzel und Potenz.',
+          'floor(x), ceil(x), round(x) — Ganzzahl-Konvertierung.',
+          'dist(x1, y1, x2, y2) — euklidischer Abstand.',
+          'min(a, b), max(a, b) — kleinerer / größerer Wert.'
+        ],
+        tryIt: 'Schreibe inside(x, y, cx, cy, r), das true liefert, wenn (x, y) im Kreis liegt. Markiere einen Kreis bei Hover.'
+      },
+      imageBasics: {
+        intro: 'Bilder werden in setup() mit loadImage(url) geladen und mit image(img, x, y) gezeichnet. loadImage braucht einen echten Pfad — lokale Dateien legst du in data/ ab. Diese Lernumgebung simuliert es mit Primitiven, die API ist identisch.',
+        concepts: [
+          'PImage img = loadImage("pfad/bild.png"); — einmal in setup.',
+          'image(img, x, y) zeichnet an der oberen linken Ecke.',
+          'image(img, x, y, b, h) zeichnet skaliert.',
+          'img.width und img.height liefern die Maße.'
+        ],
+        tryIt: 'Lege in einer echten Skizze ein PNG in den Ordner und lade es. Zeichne es an der Mausposition.'
+      },
+      imageTint: {
+        intro: 'tint() färbt Bilder ein — jeder Pixel wird mit der Tint-Farbe multipliziert. tint(255, 0, 0) macht alles rot, tint(255, 100) reduziert die Deckkraft. Mit noTint() abschalten.',
+        concepts: [
+          'tint(r, g, b) multipliziert jeden Kanal.',
+          'tint(grau, alpha) für monochrome und Transparenz.',
+          'noTint() kehrt zur Normaldarstellung zurück.',
+          'Geschichtete Tints derselben Datei → Halbton- oder Aberrations-Effekt.'
+        ],
+        tryIt: 'Tinte ein Bild mehrfach nacheinander an verschiedenen Positionen mit verschiedenen Farben — chromatischer Aberrations-Look.'
+      },
+      pixelArray: {
+        intro: 'loadPixels() kopiert die Leinwand ins pixels[]-Array. Jeder Pixel belegt 4 Einträge: R, G, B, A. Nach Änderungen mit updatePixels() zurückschreiben. So baust du Bilder pixelweise — perfekt für Shader, Mosaike, Effekte.',
+        concepts: [
+          'loadPixels() aktualisiert pixels[] mit dem aktuellen Leinwandstand.',
+          'pixels[(x + y * width) * 4 + 0] ist der Rotkanal von Pixel (x, y).',
+          '+1 grün, +2 blau, +3 alpha. Jeder Pixel = 4 Bytes.',
+          'updatePixels() schreibt Änderungen zurück.'
+        ],
+        tryIt: 'Ersetze den linearen Verlauf durch Sin-Streifen: sin(x * 0.1) * 127 + 128 als Rotkanal.'
+      },
+      getSet: {
+        intro: 'set(x, y, color) schreibt einen einzelnen Pixel. get(x, y) liest ihn. Langsamer als pixels[] für Massen, aber lesbarer für Kleinstes. set() braucht kein updatePixels() — wirkt sofort.',
+        concepts: [
+          'set(x, y, color(r, g, b)) setzt einen Pixel.',
+          'get(x, y) liefert die Farbe an (x, y).',
+          'Für viele Pixel pixels[] verwenden — set() ist pro Aufruf langsam.',
+          'get/set kombinieren mit normalem Zeichnen.'
+        ],
+        tryIt: 'Sample mit get(mouseX, mouseY) die Farbe unter dem Cursor und nutze sie als Füllung für umgebende Kreise.'
+      },
+      imageFilter: {
+        intro: 'filter() wendet eine eingebaute Transformation auf die ganze Leinwand an. BLUR weicht, GRAY entsättigt, INVERT kehrt Farben um, THRESHOLD binarisiert. Stärke per optionalem Parameter.',
+        concepts: [
+          'filter(BLUR, radius) — Gauß-Weichzeichner.',
+          'filter(GRAY) — Graustufen.',
+          'filter(INVERT) — Farb-Negativ.',
+          'filter(THRESHOLD, level) — kontrastreiches Schwarzweiß.'
+        ],
+        tryIt: 'Wende BLUR, GRAY, INVERT in Folge an. Tausche die Reihenfolge — das Ergebnis ändert sich. Warum?'
+      },
+      millisTime: {
+        intro: 'millis() liefert die Millisekunden seit Skizzenstart. Die präziseste Zeitmessung unabhängig vom frameRate. frameCount zählt Frames; millis Wanduhrzeit.',
+        concepts: [
+          'millis() / 1000.0 — verstrichene Sekunden.',
+          'Als Eingabe für sin/cos für FPS-unabhängige Animation.',
+          'startTime speichern und mit millis() vergleichen für Dauer.',
+          'Reset: einen neuen "Epoch"-Wert speichern — Processing setzt millis nicht selbst zurück.'
+        ],
+        tryIt: 'Trigger eine Aktion, wenn millis() 5000 überschreitet — flashe die Leinwand oder logge.'
+      },
+      dateTime: {
+        intro: 'Processing exponiert die Systemuhr: year(), month(), day(), hour(), minute(), second(). Jede liefert den aktuellen Wert als Zahl. Mit text() baust du Uhren, Kalender und zeitabhängige Animationen.',
+        concepts: [
+          'hour() liefert 0-23, minute() und second() liefern 0-59.',
+          'year() / month() / day() liefern Kalenderwerte (Monat 1-12).',
+          'Jeder Aufruf liest frisch — sie aktualisieren sich.',
+          'Mit nf() führende Nullen: nf(minute(), 2).'
+        ],
+        tryIt: 'Mappe month() auf einen Hue 0-360, sodass die Leinwand durch die Jahreszeiten zykliert.'
+      },
+      extendsClass: {
+        intro: 'Eine Klasse kann eine andere erweitern und deren Felder/Methoden erben. Das Kind ruft super() für den Eltern-Konstruktor auf. Vererbung teilt Verhalten zwischen verwandten Typen — Shape gibt Position; Circle und Square erweitern mit eigenem draw.',
+        concepts: [
+          'class Kind extends Eltern { ... } — deklariert Vererbung.',
+          'super(args) ruft den Eltern-Konstruktor auf.',
+          'Geerbte Methoden überschreibst du, indem du sie im Kind neu definierst.',
+          'Vererbung für "ist-ein", Komposition für "hat-ein".'
+        ],
+        tryIt: 'Füge eine Square-Klasse hinzu, die Shape erweitert. Zeichne Quadrate gemischt mit Bubbles in derselben Schleife.'
+      },
+      polymorphism: {
+        intro: 'Polymorphismus: gleicher Methodenname, verschiedenes Verhalten je Typ. Eine Liste von Animals kann Dogs und Cats enthalten; speak() liefert je nach Klasse anderes — ohne if-Checks. Basis für Strategy-Patterns und Plugin-Architekturen.',
+        concepts: [
+          'Methode am Eltern definieren, im Kind überschreiben.',
+          'Aufruf an einer Eltern-Referenz dispatcht zur tatsächlichen Unterklasse.',
+          'Sauberer als lange if/else-Ketten zur Typprüfung.',
+          'Basis für Strategy-Patterns und Plugin-Architekturen.'
+        ],
+        tryIt: 'Füge eine Bird-Klasse hinzu, die "tweet" liefert. Push einige Vögel ins Array — die Schleife läuft unverändert.'
+      },
+      vertexShape: {
+        intro: 'Eigene Polygone baust du mit beginShape(), mehreren vertex(x, y) und endShape(CLOSE). CLOSE schließt das letzte zurück zum ersten. Beliebig viele Vertices — Processing verbindet sie der Reihe nach.',
+        concepts: [
+          'beginShape() / endShape(CLOSE) rahmt das Polygon.',
+          'vertex(x, y) fügt eine Ecke hinzu.',
+          'stroke() / fill() vor beginShape steuern den Stil.',
+          'beginShape(POINTS), beginShape(LINES), beginShape(TRIANGLES) — Render-Modi.'
+        ],
+        tryIt: 'Baue einen Stern, indem du Vertices abwechselnd auf einem kleinen und großen Radius um einen Kreis platzierst.'
+      },
+      bezierCurve: {
+        intro: 'Bezier-Kurven sind glatte Kurven aus Anker- und Kontrollpunkten. bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2) zeichnet eine kubische Kurve, die zu den Kontrollpunkten gebogen wird. Kontrollpunkte ziehen — sie liegen nicht auf der Kurve.',
+        concepts: [
+          'bezier() — kubische Kurve mit zwei Kontrollpunkten.',
+          'curveVertex() — Catmull-Rom-artiger Spline durch Punkte.',
+          'Anker = Start/Ende. Kontrollpunkte formen die Biegung.',
+          'Für SVG-Pfade, organische Formen und Bewegungsbahnen.'
+        ],
+        tryIt: 'Animiere die Kontrollpunkte mit sin/cos — die Kurve atmet.'
+      },
+      customShapes: {
+        intro: 'Kombiniere vertex(), Trig und Parameter zu wiederverwendbaren Shape-Funktionen. drawCog(cx, cy, r, zähne) nimmt Mittelpunkt, Radius, Zahnzahl und alterniert zwei Radien um einen Kreis. Dieselbe Idee erzeugt Sterne und Sonnenstrahlen.',
+        concepts: [
+          'Shape-Logik in eine Funktion packen — gleicher Aufruf, verschiedene Größen.',
+          'Winkel von 0 bis TWO_PI um den Kreis laufen.',
+          'Alternierende Radien erzeugen Zähne, Zacken oder Sterne.',
+          'Ein zweiter Pass kann innen Details ergänzen.'
+        ],
+        tryIt: 'Füge einen Winkel-Parameter hinzu und drehe per frameCount * 0.01. Setze mehrere Zahnräder nebeneinander.'
+      },
+      physicsGravity: {
+        intro: 'Die einfachste Physik: Position, Geschwindigkeit, Beschleunigung. Pro Frame: vel += acc; pos += vel. Eine Beschleunigung (0, 0.2) ist Schwerkraft. Sprung kehrt das Vorzeichen der y-Geschwindigkeit um, mit Energieverlust.',
+        concepts: [
+          'pos += vel; vel += acc; — Euler-Integration.',
+          'Schwerkraft ist eine konstante abwärtsgerichtete Beschleunigung.',
+          'Sprung: bei Verlassen des Bildes vel umkehren und mit < 1 multiplizieren.',
+          'PVector verpackt diese Vektoren in saubere Methoden.'
+        ],
+        tryIt: 'Setze acc.x klein für Wind. Multipliziere vel pro Frame mit 0.99 für Luftwiderstand.'
+      },
+      physicsSprings: {
+        intro: 'Eine Feder zieht zur Ruhelage mit zur Auslenkung proportionaler Kraft. Hooke: F = -k * (x - rest). Mit Dämpfung (Geschwindigkeit * 0.95) klingt die Schwingung ab.',
+        concepts: [
+          'force = -k * (x - rest), k = Steifigkeit.',
+          'velocity += force; velocity *= dämpfung; position += velocity.',
+          'Ohne Dämpfung schwingt die Feder ewig.',
+          'k und Dämpfung sind Regler — nach Geschmack einstellen.'
+        ],
+        tryIt: 'k = 0.2 (steif) vs 0.01 (locker). damping = 1 (ewig) vs 0.85 (kommt schnell zur Ruhe).'
+      },
+      physicsCollision: {
+        intro: 'Paarweise Kollision: für jedes Ball-Paar prüfen, ob der Abstand kleiner als die Summe der Radien ist. Wenn ja, Geschwindigkeiten tauschen. O(n²) und für viele Objekte ungeeignet, aber für Dutzende ok.',
+        concepts: [
+          'dist(a.pos.x, a.pos.y, b.pos.x, b.pos.y) < a.r + b.r → Kollision.',
+          'Geschwindigkeiten tauschen als schnelle (verlustbehaftete) Antwort.',
+          'Echte elastische Kollision nutzt Vektoren und Massen.',
+          'Räumliche Partitionierung (Grid, Quad-Tree) skaliert.'
+        ],
+        tryIt: 'Erhöhe auf 30 Bälle und beobachte die FPS. Reduziere auf 6 mit Farben, um Paar-Kollisionen zu sehen.'
+      },
+      flowField: {
+        intro: 'Ein Flussfeld bildet jeden Punkt auf eine Richtung ab. Mit noise() für den Winkel ergibt sich organische, treibende Bewegung. Partikel folgen dem lokalen Feld — wirkt wie Wind, Strömung oder Rauch.',
+        concepts: [
+          'angle = noise(x * scale, y * scale) * TWO_PI * n. n bestimmt die "Wirbel".',
+          'Schritt: (cos(angle), sin(angle)) * speed.',
+          'frameCount als dritte Noise-Dimension lässt das Feld driften.',
+          'Niedriges Alpha hinterlässt Spuren — Stromlinien-Look.'
+        ],
+        tryIt: 'Ersetze Zufallspunkte durch persistente Partikel — sie wandern; bei Verlassen der Leinwand resetten.'
+      },
+      gridGen: {
+        intro: 'Generative Kunst startet oft mit einem Raster. Iteriere Zellen; entscheide pro Zelle (Noise, Position, Zufall), ob/wie gezeichnet wird. Raster gibt Struktur, Zell-Logik gibt Vielfalt.',
+        concepts: [
+          'Zwei verschachtelte Schleifen durchlaufen das Raster.',
+          'noise(x * scale, y * scale) liefert pro Zelle einen weichen Wert — Nachbarn kohärent.',
+          'Mit einem Schwellwert Zellen erscheinen/verschwinden lassen.',
+          'Pro Zelle Füllung, Drehung, Subform variieren — endlose Varianten.'
+        ],
+        tryIt: 'Ersetze rect durch circle mit noise-Radius. Erhöhe den Schwellwert von 0.5 auf 0.7 für ausgedünnte Komposition.'
+      },
+      lSystems: {
+        intro: 'L-Systeme erzeugen Strings, indem sie Regeln auf ein Axiom anwenden. Interpretiert man jedes Zeichen als Schildkröten-Befehl — F = vor, + = rechts, - = links — entstehen nach wenigen Iterationen fraktal-artige Formen.',
+        concepts: [
+          'Mit einem Axiom beginnen (ein einzelner String).',
+          'Regeln anwenden: jedes Zeichen wird durch einen anderen String ersetzt.',
+          'Nach N Iterationen kann der String sehr lang sein.',
+          'Mit einer Schildkröte interpretieren: vor, links, rechts, push, pop.'
+        ],
+        tryIt: 'Probiere die Regel "F → F-F+F". Mache 5 Iterationen. Füge [ und ] für Verzweigungen hinzu, um Bäume zu züchten.'
+      },
+      pgraphics: {
+        intro: 'createGraphics(b, h) erzeugt eine eigene Off-Screen-Leinwand. Die gleiche Zeichen-API. Mit image(pg, 0, 0) wird sie auf die Hauptleinwand gepatcht. Praktisch für Caching, Layering, Post-Effekte.',
+        concepts: [
+          'PGraphics pg = createGraphics(b, h); — Buffer erzeugen.',
+          'In echtem Processing pg.beginDraw() / pg.endDraw(); in p5.js nicht nötig.',
+          'pg.clear(), pg.fill(), pg.rect() — gleiche API mit Präfix.',
+          'Einmal in den Buffer zu zeichnen ist schneller als jedes Frame neu.'
+        ],
+        tryIt: 'Zeichne ein langsames Hintergrundmuster einmal in den Buffer. In draw() den Buffer plus eine bewegte Form.'
+      },
+      blendModes: {
+        intro: 'blendMode() ändert, wie neue Pixel mit vorhandenen kombiniert werden. ADD hellt auf — Schwarz wird farbig. MULTIPLY verdunkelt. SCREEN hellt auf, behält Highlights. Reset mit blendMode(BLEND).',
+        concepts: [
+          'BLEND — Standard-Alphakompositum.',
+          'ADD — RGB summieren; ideal fürs Glühen.',
+          'MULTIPLY — RGB multiplizieren; gut für Schatten/Tints.',
+          'SCREEN — Inverse von Multiply; gut für Highlights.',
+          'DIFFERENCE / EXCLUSION — psychedelische Resultate.'
+        ],
+        tryIt: 'Wechsle zwischen den Kreisen zu MULTIPLY. Vergleiche mit ADD — gleiche Formen, völlig anderer Look.'
+      },
+      saveFrame: {
+        intro: 'save() schreibt die aktuelle Leinwand in eine Datei. saveFrame() macht dasselbe mit automatischer Nummerierung. In Processing direkt auf Disk; in p5.js triggert der Browser einen Download. So exportierst du finale Werke.',
+        concepts: [
+          'save("bild.png") schreibt ein einzelnes Bild.',
+          'saveFrame("seq-####.png") nummeriert mit frameCount.',
+          'PNG behält Transparenz; JPG flacht ab.',
+          'Aus Tasten-/Mausevent aufrufen, um gezielt zu speichern.'
+        ],
+        tryIt: 'Füge ein keyPressed hinzu, das die Leinwand speichert. Nutze hour() und minute() im Dateinamen für eindeutige Namen.'
+      },
+      exportSequence: {
+        intro: 'Animationen exportierst du als Frame-Sequenz. saveFrame("name-####.png") schreibt pro Frame ein PNG. Mit ffmpeg & Co. zu MP4/GIF zusammenfügen — Processing schreibt selbst kein Video.',
+        concepts: [
+          'saveFrame("out-####") — #### wird zur null-aufgefüllten Frame-Nummer.',
+          'frameRate begrenzen, um Zieldauer zu treffen.',
+          'Nicht jeden Run exportieren — nur bei Trigger speichern.',
+          'Externe Tools: ffmpeg, ImageMagick, Online-GIF-Generatoren.'
+        ],
+        tryIt: 'Setze ein Frame-Budget — z. B. 60 Frames @ 8 fps = 7,5 s Loop. Bis dahin speichern, dann noLoop().'
+      },
+      finalGame: {
+        intro: 'Kombiniere Eingabe, Animation, Klassen und Arrays in einem kleinen Spiel. Spieler folgt der Maus; Geschosse fallen. Zustand in Vektoren und Arrays; Verhalten in update + draw. Wenn du diese Schleife verinnerlichst, baust du jedes 2D-Spiel.',
+        concepts: [
+          'Spielerposition pro Frame anhand der Eingabe setzen.',
+          'Hindernisse per Timer spawnen (frameCount % N).',
+          'Jedes Hindernis updaten, zeichnen, dann auf Kollision prüfen.',
+          'Game Over: Spawnen stoppen, "verloren" zeichnen, noLoop().'
+        ],
+        tryIt: 'Füge einen Score hinzu, der pro Frame steigt. Beende das Spiel bei Treffer und zeige den Score an.'
+      },
+      finalArt: {
+        intro: 'Generative Kunst ist das Ziel der meisten Processing-Lernenden. Startrezept: Ein Kreis aus Punkten, deren Positionen über die Zeit oszillieren, mit niedrigem Alpha gemalt — Spuren bauen sich auf. Konstanten anpassen, ausführen, reagieren — endlose Varianten.',
+        concepts: [
+          'Eine Schleife über Punkte per Winkel um einen Kreis.',
+          'Zeit als Eingabe: frameCount * 0.02 wächst kontinuierlich.',
+          'Niedrige Alpha-Füllungen schichten weich, malerisch.',
+          'Zwei Parameter (Anzahl, Frequenz) genügen oft für Schönheit.'
+        ],
+        tryIt: 'Ersetze die Kreisanordnung durch eine Lissajous-Figur: x = cos(a * 3 + t), y = sin(a * 2 + t). Probiere Verhältnisse 3:2, 5:4.'
       }
     }
   }
