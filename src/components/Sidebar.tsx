@@ -1,8 +1,38 @@
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties, DragEvent, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
+import type { Theme, Translations, UserNodes, UserNode, SidebarTab, Status } from '../types';
 import { modules } from '../i18n';
 import { displayFileName } from '../lib/fileNames';
 import StatusDot from './StatusDot';
 import Icon, { PdeIcon, DataFolderIcon } from './Icon';
+
+/* ------------------------------------------------------------------ */
+//  Local tree-node types produced by buildUserTree
+/* ------------------------------------------------------------------ */
+
+interface FolderNode {
+  id: string;
+  type: 'folder';
+  name: string;
+  open: boolean;
+  children: TreeNode[];
+}
+
+interface FileNodeTree {
+  id: string;
+  fileId: string;
+  type: 'file';
+  name: string;
+}
+
+type TreeNode = FolderNode | FileNodeTree;
+
+interface PendingChild {
+  parentId: string;
+  type: 'file' | 'folder' | 'sketch';
+  onCommit: (name: string) => void;
+  onCancel: () => void;
+}
 
 // Compute the on-screen status of a lesson.
 //   done   → any lesson the user has ticked off via the status dot
@@ -11,20 +41,47 @@ import Icon, { PdeIcon, DataFolderIcon } from './Icon';
 //   locked → everything further down the curriculum
 // We check `done` BEFORE `active` so a ticked-off lesson keeps its green check
 // even while it's the currently-open tab.
-function computeStatus(id, activeId, visited, orderedIds) {
+function computeStatus(
+  id: string,
+  activeId: string | null,
+  visited: Set<string>,
+  orderedIds: string[]
+): Status {
   if (visited.has(id)) return 'done';
   if (id === activeId) return 'active';
-  const activeIdx = orderedIds.indexOf(activeId);
+  const activeIdx = activeId != null ? orderedIds.indexOf(activeId) : -1;
   const idx = orderedIds.indexOf(id);
   if (idx === activeIdx + 1) return 'next';
   return 'locked';
 }
 
-function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone, onPrev, onNext }) {
-  const [collapsedMods, setCollapsedMods] = useState({});
-  const toggleMod = (id) => setCollapsedMods(p => ({ ...p, [id]: !p[id] }));
+interface CourseListProps {
+  t: Translations;
+  c: Theme;
+  activeId: string | null;
+  onOpen: (id: string) => void;
+  visited: Set<string>;
+  orderedIds: string[];
+  onToggleDone: (id: string) => void;
+  onPrev: () => void;
+  onNext: () => void;
+}
 
-  const navIdx = orderedIds.indexOf(activeId);
+function CourseList({
+  t,
+  c,
+  activeId,
+  onOpen,
+  visited,
+  orderedIds,
+  onToggleDone,
+  onPrev,
+  onNext,
+}: CourseListProps) {
+  const [collapsedMods, setCollapsedMods] = useState<Record<string, boolean>>({});
+  const toggleMod = (id: string) => setCollapsedMods((p) => ({ ...p, [id]: !p[id] }));
+
+  const navIdx = activeId != null ? orderedIds.indexOf(activeId) : -1;
   const prevDisabled = navIdx <= 0;
   const nextDisabled = navIdx === -1 || navIdx >= orderedIds.length - 1;
 
@@ -113,7 +170,7 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone,
                     background: isActive ? c.activeRow : 'transparent',
                     borderLeft: `2px solid ${borderColor}`,
                     transition: 'background 0.15s',
-                    ['--hover-bg']: c.panelHover
+                    ['--hover-bg' as string]: c.panelHover
                   }}
                 >
                   <StatusDot
@@ -162,7 +219,7 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone,
   );
 }
 
-function lessonNavBtn(c, disabled) {
+function lessonNavBtn(c: Theme, disabled: boolean): CSSProperties {
   return {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
     background: disabled ? 'transparent' : c.resetBg,
@@ -173,14 +230,22 @@ function lessonNavBtn(c, disabled) {
     fontSize: 11.5, fontWeight: 600,
     fontFamily: 'Inter, sans-serif',
     transition: 'all 0.15s',
-    ['--hover-border']: c.accentBorder
+    ['--hover-border' as string]: c.accentBorder
   };
 }
 
 // Inline input used for both "create new" (pending rows) and "rename".
 // Enter confirms, Escape cancels, blur confirms (matching VS Code).
-function InlineInput({ c, initial, onCommit, onCancel, placeholder }) {
-  const ref = useRef(null);
+interface InlineInputProps {
+  c: Theme;
+  initial?: string;
+  onCommit: (value: string) => void;
+  onCancel: () => void;
+  placeholder?: string;
+}
+
+function InlineInput({ c, initial, onCommit, onCancel, placeholder }: InlineInputProps) {
+  const ref = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(initial || '');
 
   useEffect(() => {
@@ -199,9 +264,9 @@ function InlineInput({ c, initial, onCommit, onCancel, placeholder }) {
       type="text"
       value={value}
       placeholder={placeholder}
-      onChange={(e) => setValue(e.target.value)}
-      onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => {
+      onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+      onClick={(e: MouseEvent<HTMLInputElement>) => e.stopPropagation()}
+      onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
         e.stopPropagation();
         if (e.key === 'Enter') { e.preventDefault(); onCommit(value); }
         else if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
@@ -225,6 +290,30 @@ function InlineInput({ c, initial, onCommit, onCancel, placeholder }) {
 // delete-confirm-in-place, and drag-and-drop moves.
 // For folders it also exposes +file / +folder buttons on hover so users
 // can nest, and acts as a drop target for reorganization.
+interface FileNodeProps {
+  node: TreeNode;
+  depth: number;
+  c: Theme;
+  activeId: string | null;
+  onOpen: (fileId: string) => void;
+  onToggle: (id: string) => void;
+  deletable?: boolean;
+  editingId: string | null;
+  setEditingId: (id: string | null) => void;
+  confirmDeleteId: string | null;
+  setConfirmDeleteId: (id: string | null) => void;
+  onStartCreate?: (parentId: string, type: 'file' | 'folder' | 'sketch') => void;
+  onRename: (id: string, name: string) => void;
+  onDelete: (id: string) => void;
+  childrenNodes?: TreeNode[];
+  pendingChild?: PendingChild | null;
+  draggedId: string | null;
+  setDraggedId: (id: string | null) => void;
+  dragOverId: string | null;
+  setDragOverId: (id: string | null) => void;
+  onDropTo: (parentId: string) => void;
+}
+
 function FileNode({
   node, depth, c, activeId, onOpen, onToggle,
   deletable,
@@ -235,7 +324,7 @@ function FileNode({
   draggedId, setDraggedId,
   dragOverId, setDragOverId,
   onDropTo
-}) {
+}: FileNodeProps) {
   const isFolder = node.type === 'folder';
   const id = isFolder ? node.id : node.fileId;
   const isEditing = editingId === id;
@@ -249,7 +338,7 @@ function FileNode({
 
   const isActive = !isFolder && node.fileId === activeId;
 
-  const handleRowClick = () => {
+  const handleRowClick = (): void => {
     if (isEditing || isConfirming) return;
     if (isFolder) onToggle(node.id);
     else onOpen(node.fileId);
@@ -258,7 +347,7 @@ function FileNode({
   // Drag handlers — only enabled on user nodes (deletable).
   const dragProps = deletable ? {
     draggable: !isEditing,
-    onDragStart: (e) => {
+    onDragStart: (e: DragEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.dataTransfer.effectAllowed = 'move';
       // Some browsers refuse to start a drag without data on the transfer.
@@ -274,19 +363,19 @@ function FileNode({
   // Drop handlers — user folders become drop targets. Hovering a folder
   // while dragging auto-opens it so you can drop deeper.
   const folderDropProps = (deletable && isFolder) ? {
-    onDragOver: (e) => {
+    onDragOver: (e: DragEvent<HTMLDivElement>) => {
       if (!draggedId || draggedId === node.id) return;
       e.preventDefault();
       e.stopPropagation();
       e.dataTransfer.dropEffect = 'move';
       if (dragOverId !== node.id) setDragOverId(node.id);
     },
-    onDragLeave: (e) => {
+    onDragLeave: (e: DragEvent<HTMLDivElement>) => {
       // Only clear if we're actually leaving this row (not entering a child).
-      if (e.currentTarget.contains(e.relatedTarget)) return;
+      if (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)) return;
       if (dragOverId === node.id) setDragOverId(null);
     },
-    onDrop: (e) => {
+    onDrop: (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
       if (draggedId && draggedId !== node.id) {
@@ -315,7 +404,7 @@ function FileNode({
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         flex: 1, minWidth: 0
       }}
-      onDoubleClick={deletable ? (e) => { e.stopPropagation(); setEditingId(id); } : undefined}
+      onDoubleClick={deletable ? (e: MouseEvent<HTMLSpanElement>) => { e.stopPropagation(); setEditingId(id); } : undefined}
     >
       {isPde ? displayFileName(node.name) : node.name}
     </span>
@@ -341,7 +430,7 @@ function FileNode({
           ? `2px solid ${c.accent}`
           : (isActive && !isFolder ? `2px solid ${c.accent}` : '2px solid transparent'),
         opacity: isBeingDragged ? 0.4 : 1,
-        ['--hover-bg']: c.panelHover
+        ['--hover-bg' as string]: c.panelHover
       }}
     >
       {isFolder && (
@@ -368,7 +457,7 @@ function FileNode({
         <InlineInput
           c={c}
           initial={isPde ? displayFileName(node.name) : node.name}
-          onCommit={(v) => onRename(id, v)}
+          onCommit={(v: string) => onRename(id, v)}
           onCancel={() => setEditingId(null)}
         />
       ) : nameLabel}
@@ -378,7 +467,7 @@ function FileNode({
         isConfirming ? (
           <>
             <button
-              onClick={(e) => { e.stopPropagation(); onDelete(id); }}
+              onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onDelete(id); }}
               title="Confirm delete"
               style={{
                 background: '#ef4444', border: 'none', color: 'white',
@@ -388,7 +477,7 @@ function FileNode({
               }}
             >DELETE</button>
             <button
-              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
+              onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); setConfirmDeleteId(null); }}
               title="Cancel"
               style={{
                 background: 'none', border: `1px solid ${c.border}`, color: c.textMuted,
@@ -403,7 +492,7 @@ function FileNode({
               <>
                 <button
                   className="sb-iconbtn file-row-action"
-                  onClick={(e) => { e.stopPropagation(); onStartCreate(node.id, 'file'); }}
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onStartCreate(node.id, 'file'); }}
                   title="New file in folder"
                   aria-label="New file in folder"
                   style={iconBtn(c)}
@@ -412,7 +501,7 @@ function FileNode({
                 </button>
                 <button
                   className="sb-iconbtn file-row-action"
-                  onClick={(e) => { e.stopPropagation(); onStartCreate(node.id, 'folder'); }}
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onStartCreate(node.id, 'folder'); }}
                   title="New folder in folder"
                   aria-label="New folder in folder"
                   style={iconBtn(c)}
@@ -423,7 +512,7 @@ function FileNode({
             )}
             <button
               className="sb-iconbtn file-row-action"
-              onClick={(e) => { e.stopPropagation(); setEditingId(id); }}
+              onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); setEditingId(id); }}
               title="Rename"
               aria-label={`Rename ${node.name}`}
               style={iconBtn(c)}
@@ -432,10 +521,10 @@ function FileNode({
             </button>
             <button
               className="sb-iconbtn file-row-action"
-              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(id); }}
+              onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); setConfirmDeleteId(id); }}
               title={isFolder ? 'Delete folder' : 'Delete file'}
               aria-label={`Delete ${node.name}`}
-              style={{ ...iconBtn(c), ['--hover-color']: '#ef4444' }}
+              style={{ ...iconBtn(c), ['--hover-color' as string]: '#ef4444' }}
             >
               <Icon name="trash" size={12} />
             </button>
@@ -472,7 +561,7 @@ function FileNode({
               confirmDeleteId={confirmDeleteId} setConfirmDeleteId={setConfirmDeleteId}
               onStartCreate={onStartCreate}
               onRename={onRename} onDelete={onDelete}
-              childrenNodes={child.children}
+              childrenNodes={child.type === 'folder' ? child.children : undefined}
               pendingChild={pendingChild}
               draggedId={draggedId} setDraggedId={setDraggedId}
               dragOverId={dragOverId} setDragOverId={setDragOverId}
@@ -486,7 +575,15 @@ function FileNode({
 }
 
 // The pending "new file/folder/sketch" row — an inline input with a matching icon.
-function PendingRow({ c, depth, type, onCommit, onCancel }) {
+interface PendingRowProps {
+  c: Theme;
+  depth: number;
+  type: 'file' | 'folder' | 'sketch';
+  onCommit: (name: string) => void;
+  onCancel: () => void;
+}
+
+function PendingRow({ c, depth, type, onCommit, onCancel }: PendingRowProps) {
   const isFolder = type === 'folder' || type === 'sketch';
   const isSketch = type === 'sketch';
   return (
@@ -521,39 +618,63 @@ function PendingRow({ c, depth, type, onCommit, onCancel }) {
 }
 
 // Build a tree from the flat userNodes map, rooted at parentId='root'.
-function buildUserTree(userNodes, openFolders) {
-  const byParent = {};
+function buildUserTree(
+  userNodes: UserNodes,
+  openFolders: Record<string, boolean>
+): TreeNode[] {
+  const byParent: Record<string, UserNode[]> = {};
   for (const n of Object.values(userNodes)) {
-    (byParent[n.parentId || 'root'] ||= []).push(n);
+    const parent = n.parentId || 'root';
+    byParent[parent] ||= [];
+    byParent[parent].push(n);
   }
-  const make = (parentId) => (byParent[parentId] || [])
-    .sort((a, b) => {
-      // Folders before files, then alphabetical.
-      if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
-      return a.name.localeCompare(b.name);
-    })
-    .map(n => n.type === 'folder'
-      ? {
-          id: n.id, type: 'folder', name: n.name,
-          open: openFolders[n.id] ?? true,
-          children: make(n.id)
-        }
-      : {
-          id: `file-${n.id}`, fileId: n.id, type: 'file', name: n.name
-        });
+  const make = (parentId: string): TreeNode[] =>
+    (byParent[parentId] || [])
+      .sort((a, b) => {
+        // Folders before files, then alphabetical.
+        if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      })
+      .map((n) =>
+        n.type === 'folder'
+          ? {
+              id: n.id,
+              type: 'folder',
+              name: n.name,
+              open: openFolders[n.id] ?? true,
+              children: make(n.id),
+            }
+          : {
+              id: `file-${n.id}`,
+              fileId: n.id,
+              type: 'file',
+              name: n.name,
+            }
+      );
   return make('root');
+}
+
+interface FileManagerProps {
+  c: Theme;
+  activeId: string | null;
+  onOpen: (id: string) => void;
+  userNodes: UserNodes;
+  onCreate: (parentId: string, type: 'file' | 'folder' | 'sketch', name: string) => void;
+  onDeleteNode: (id: string) => void;
+  onRenameNode: (id: string, name: string) => void;
+  onMoveNode?: (id: string, parentId: string) => void;
 }
 
 function FileManager({
   c, activeId, onOpen,
   userNodes, onCreate, onDeleteNode, onRenameNode, onMoveNode
-}) {
-  const [openFolders, setOpenFolders] = useState({});
-  const [pending, setPending] = useState(null); // {parentId, type}
-  const [editingId, setEditingId] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-  const [draggedId, setDraggedId] = useState(null);
-  const [dragOverId, setDragOverId] = useState(null);
+}: FileManagerProps) {
+  const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
+  const [pending, setPending] = useState<{ parentId: string; type: 'file' | 'folder' | 'sketch' } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [rootDragOver, setRootDragOver] = useState(false);
 
   // Any click outside the confirm row cancels the confirmation.
@@ -566,22 +687,22 @@ function FileManager({
     return () => { clearTimeout(id); document.removeEventListener('click', h); };
   }, [confirmDeleteId]);
 
-  const toggle = (id) => setOpenFolders(p => ({
+  const toggle = (id: string) => setOpenFolders((p) => ({
     ...p,
     [id]: !(p[id] ?? true) // default folders open so newly created items are visible
   }));
 
-  const startCreate = (parentId, type) => {
+  const startCreate = (parentId: string, type: 'file' | 'folder' | 'sketch') => {
     // Make sure we can see the input: if it's inside a folder, open that folder.
     if (parentId && parentId !== 'root') {
-      setOpenFolders(p => ({ ...p, [parentId]: true }));
+      setOpenFolders((p) => ({ ...p, [parentId]: true }));
     }
     setEditingId(null);
     setConfirmDeleteId(null);
     setPending({ parentId: parentId || 'root', type });
   };
 
-  const commitCreate = (raw) => {
+  const commitCreate = (raw: string) => {
     const p = pending;
     setPending(null);
     const name = (raw || '').trim();
@@ -589,19 +710,19 @@ function FileManager({
     onCreate(p.parentId, p.type, name);
   };
 
-  const commitRename = (id, raw) => {
+  const commitRename = (id: string, raw: string) => {
     setEditingId(null);
     const name = (raw || '').trim();
     if (!name) return;
     onRenameNode(id, name);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     setConfirmDeleteId(null);
     onDeleteNode(id);
   };
 
-  const handleDropTo = (parentId) => {
+  const handleDropTo = (parentId: string) => {
     if (!draggedId || !onMoveNode) return;
     onMoveNode(draggedId, parentId || 'root');
     setDraggedId(null);
@@ -609,7 +730,7 @@ function FileManager({
     setRootDragOver(false);
     // Make sure the destination folder is visible so the move is obvious.
     if (parentId && parentId !== 'root') {
-      setOpenFolders(p => ({ ...p, [parentId]: true }));
+      setOpenFolders((p) => ({ ...p, [parentId]: true }));
     }
   };
 
@@ -701,7 +822,7 @@ function FileManager({
           confirmDeleteId={confirmDeleteId} setConfirmDeleteId={setConfirmDeleteId}
           onStartCreate={startCreate}
           onRename={commitRename} onDelete={handleDelete}
-          childrenNodes={node.children}
+          childrenNodes={node.type === 'folder' ? node.children : undefined}
           pendingChild={pendingChildRender}
           draggedId={draggedId} setDraggedId={setDraggedId}
           dragOverId={dragOverId} setDragOverId={setDragOverId}
@@ -713,13 +834,13 @@ function FileManager({
           move items back out of nested folders. Only "armed" while dragging. */}
       {draggedId && userNodes[draggedId]?.parentId !== 'root' && (
         <div
-          onDragOver={(e) => {
+          onDragOver={(e: DragEvent<HTMLDivElement>) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
             if (!rootDragOver) setRootDragOver(true);
           }}
           onDragLeave={() => setRootDragOver(false)}
-          onDrop={(e) => { e.preventDefault(); handleDropTo('root'); }}
+          onDrop={(e: DragEvent<HTMLDivElement>) => { e.preventDefault(); handleDropTo('root'); }}
           style={{
             margin: '4px 10px 0',
             padding: '10px 12px',
@@ -741,14 +862,36 @@ function FileManager({
   );
 }
 
-function iconBtn(c) {
+function iconBtn(c: Theme): CSSProperties {
   return {
     background: 'none', border: 'none', cursor: 'pointer',
     padding: 4, borderRadius: 4,
     color: c.textMuted,
     display: 'flex', alignItems: 'center',
-    ['--hover-color']: c.accent
+    ['--hover-color' as string]: c.accent
   };
+}
+
+interface SidebarProps {
+  t: Translations;
+  c: Theme;
+  collapsed: boolean;
+  setCollapsed: (v: boolean) => void;
+  tab: SidebarTab;
+  setTab: (tab: SidebarTab) => void;
+  activeId: string | null;
+  onOpen: (id: string) => void;
+  visited: Set<string>;
+  orderedIds: string[];
+  width: number;
+  onToggleDone: (id: string) => void;
+  userNodes: UserNodes;
+  onCreateNode: (parentId: string, type: 'file' | 'folder' | 'sketch', name: string) => void;
+  onDeleteNode: (id: string) => void;
+  onRenameNode: (id: string, name: string) => void;
+  onMoveNode?: (id: string, parentId: string) => void;
+  onPrevLesson: () => void;
+  onNextLesson: () => void;
 }
 
 export default function Sidebar({
@@ -757,7 +900,7 @@ export default function Sidebar({
   onToggleDone,
   userNodes, onCreateNode, onDeleteNode, onRenameNode, onMoveNode,
   onPrevLesson, onNextLesson
-}) {
+}: SidebarProps) {
   if (collapsed) {
     return (
       <div style={{
@@ -781,8 +924,8 @@ export default function Sidebar({
           <Icon name="chevron-right" size={16} />
         </button>
         {[
-          { id: 'courses', title: t.tabCourses, icon: 'book-open' },
-          { id: 'files', title: t.tabFiles, icon: 'folder' }
+          { id: 'courses' as const, title: t.tabCourses, icon: 'book-open' as const },
+          { id: 'files' as const, title: t.tabFiles, icon: 'folder' as const }
         ].map(tb => (
           <button
             key={tb.id}
@@ -794,7 +937,7 @@ export default function Sidebar({
               padding: 7, borderRadius: 6,
               color: tab === tb.id ? c.accent : c.textMuted,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              ['--hover-color']: c.text
+              ['--hover-color' as string]: c.text
             }}
           >
             <Icon name={tb.icon} size={16} />
@@ -817,8 +960,8 @@ export default function Sidebar({
       }}>
         <div style={{ display: 'flex', flex: 1, gap: 2 }}>
           {[
-            { id: 'courses', label: t.tabCourses, icon: 'book-open' },
-            { id: 'files', label: t.tabFiles, icon: 'folder' }
+            { id: 'courses' as const, label: t.tabCourses, icon: 'book-open' as const },
+            { id: 'files' as const, label: t.tabFiles, icon: 'folder' as const }
           ].map(tb => (
             <button
               key={tb.id}
@@ -850,7 +993,7 @@ export default function Sidebar({
             padding: '6px 8px', borderRadius: 6, color: c.textMuted,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, minWidth: 30, minHeight: 28,
-            ['--hover-color']: c.text
+            ['--hover-color' as string]: c.text
           }}
         >
           <Icon name="chevron-left" size={14} />

@@ -1,11 +1,28 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { languages } from '../i18n';
+import type { Theme, Translations } from '../types';
 import Icon from './Icon';
+
+interface ToggleOption {
+  value: string;
+  label: string | null;
+  title: string;
+  icon?: React.ReactNode;
+}
+
+interface ToggleGroupProps {
+  c: Theme;
+  options: ToggleOption[];
+  value: string;
+  onChange: (value: string) => void;
+  ariaLabel: string;
+  small?: boolean;
+}
 
 // Pill-style toggle group. Declared at module scope so React doesn't tear it
 // down on every <Header> render (that would both reset any internal state and
 // break react-hooks/static-components).
-function ToggleGroup({ c, options, value, onChange, ariaLabel, small }) {
+function ToggleGroup({ c, options, value, onChange, ariaLabel, small }: ToggleGroupProps) {
   return (
     <div
       role="group"
@@ -46,10 +63,19 @@ function ToggleGroup({ c, options, value, onChange, ariaLabel, small }) {
   );
 }
 
+interface HeaderProps {
+  theme: string;
+  setTheme: React.Dispatch<React.SetStateAction<string>>;
+  lang: string;
+  setLang: React.Dispatch<React.SetStateAction<string>>;
+  t: Translations;
+  c: Theme;
+}
+
 // Top bar: YTU logo + title, theme pill toggle, language pill toggle.
 // At narrow widths we progressively shed the subtitle and the "Theme" label,
 // so the toggles don't wrap over the title.
-export default function Header({ theme, setTheme, lang, setLang, t, c }) {
+export default function Header({ theme, setTheme, lang, setLang, t, c }: HeaderProps) {
   const [width, setWidth] = useState(() =>
     typeof window === 'undefined' ? 1200 : window.innerWidth);
   useEffect(() => {
@@ -59,8 +85,8 @@ export default function Header({ theme, setTheme, lang, setLang, t, c }) {
   }, []);
 
   const showSubtitle = width >= 780;
-  const showThemeText = width >= 560;            // below this, Dark/Light shrink to icon-only
-  const showTitle = width >= 380;                 // below this the title can hide, keeping toggles usable
+  const showThemeText = width >= 560;
+  const showTitle = width >= 380;
 
   return (
     <header style={{

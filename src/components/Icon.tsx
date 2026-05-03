@@ -1,10 +1,12 @@
+import type { ReactNode, CSSProperties } from 'react';
+
 // Tiny inline Eva-icons wrapper. The paths are copied from
 // https://akveo.github.io/eva-icons (MIT licensed) so we avoid a runtime dep.
 // Every icon uses a 24x24 viewBox and renders with currentColor, so styling is
 // just `color: …` on the parent (or the `color` prop). Stroke-based icons use
 // `fill="currentColor"` since Eva builds its outline set from filled paths.
 
-const P = {
+const P: Record<string, ReactNode> = {
   'moon': (
     <path d="M12.3,22h-.1a10.31,10.31,0,0,1-7.34-3.15,10.46,10.46,0,0,1-.26-14,10.13,10.13,0,0,1,4-2.74,1,1,0,0,1,1.06.22,1,1,0,0,1,.24,1,8.4,8.4,0,0,0,1.94,8.81,8.47,8.47,0,0,0,8.83,1.94,1,1,0,0,1,1.27,1.29A10.16,10.16,0,0,1,19.6,19,10.28,10.28,0,0,1,12.3,22ZM7.46,4.92A7.93,7.93,0,0,0,6.09,6.14a8.44,8.44,0,0,0,.2,11.32A8.29,8.29,0,0,0,12.22,20h.08a8.34,8.34,0,0,0,6.78-3.49A10.37,10.37,0,0,1,7.46,4.92Z" />
   ),
@@ -167,10 +169,18 @@ const P = {
   )
 };
 
-export default function Icon({ name, size = 16, title, style, onClick, strokeWidth }) {
+interface IconProps {
+  name: string;
+  size?: number;
+  title?: string;
+  style?: CSSProperties;
+  onClick?: () => void;
+  strokeWidth?: number;
+}
+
+export default function Icon({ name, size = 16, title, style, onClick, strokeWidth }: IconProps) {
   const body = P[name];
   if (!body) {
-    // Fail loudly in dev rather than silently — makes typos obvious.
     if (typeof console !== 'undefined') console.warn(`<Icon name="${name}" />: unknown icon`);
     return null;
   }
@@ -192,11 +202,12 @@ export default function Icon({ name, size = 16, title, style, onClick, strokeWid
   );
 }
 
-// Branded green "P" tile — same silhouette as the Processing IDE's .pde file
-// icon, recolored to the YTÜ Programlama brand green so it sits with the rest
-// of the studio chrome. Hard-coded to the accent so it reads as a Processing
-// file regardless of theme.
-export function PdeIcon({ size = 14, title }) {
+interface PdeIconProps {
+  size?: number;
+  title?: string;
+}
+
+export function PdeIcon({ size = 14, title }: PdeIconProps) {
   return (
     <svg
       width={size}
@@ -220,10 +231,13 @@ export function PdeIcon({ size = 14, title }) {
   );
 }
 
-// Stacked "data" folder — same silhouette as the regular folder but with a
-// couple of horizontal lines to suggest a dataset. Used when a folder is
-// named "data", matching Processing's convention for sketch assets.
-export function DataFolderIcon({ size = 14, title, color = 'currentColor' }) {
+interface DataFolderIconProps {
+  size?: number;
+  title?: string;
+  color?: string;
+}
+
+export function DataFolderIcon({ size = 14, title, color = 'currentColor' }: DataFolderIconProps) {
   return (
     <svg
       width={size}

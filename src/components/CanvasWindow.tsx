@@ -1,30 +1,52 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import type { MouseEvent as ReactMouseEvent, CSSProperties } from 'react';
 import Icon from './Icon';
+import type { Theme } from '../types';
 
 const POS_KEY = 'studio-canvas-pos';
 
-function loadPos() {
+interface Pos {
+  x: number;
+  y: number;
+}
+
+function loadPos(): Pos | null {
   try {
     const raw = localStorage.getItem(POS_KEY);
     if (!raw) return null;
-    const p = JSON.parse(raw);
-    if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) return p;
+    const p = JSON.parse(raw) as unknown;
+    if (p && typeof p === 'object' && p !== null) {
+      const pos = p as Record<string, unknown>;
+      if (Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
+        return { x: pos.x as number, y: pos.y as number };
+      }
+    }
   } catch { /* ignore */ }
   return null;
+}
+
+interface CanvasWindowProps {
+  c: Theme;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
+  title: string;
+  hasActive: boolean;
+  sectionNum?: string | number | null;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Floating Processing-style sketch window. Draggable from the title bar,
 // closeable, with a "focus" mode that fills the viewport. Not resizable —
 // matches Processing's own windows where size() in code controls the canvas
 // dimensions.
-export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNum, isOpen, setIsOpen }) {
+export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNum, isOpen, setIsOpen }: CanvasWindowProps) {
   // First mount with no saved position: nudge to top-right corner. Compute
   // here (lazy initializer) instead of in an effect so we don't trigger a
   // cascading render — the value is correct on the very first paint.
-  const [pos, setPos] = useState(() => loadPos() || { x: Math.max(20, window.innerWidth - 460), y: 80 });
-  const [isFocused, setIsFocused] = useState(false);
-  const dragState = useRef(null);
-  const containerRef = useRef(null);
+  const [pos, setPos] = useState<Pos>(() => loadPos() || { x: Math.max(20, window.innerWidth - 460), y: 80 });
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const dragState = useRef<{ offsetX: number; offsetY: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     localStorage.setItem(POS_KEY, JSON.stringify(pos));
@@ -33,21 +55,21 @@ export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNu
   // Esc exits focus mode.
   useEffect(() => {
     if (!isFocused) return;
-    const onKey = (e) => { if (e.key === 'Escape') setIsFocused(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsFocused(false); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [isFocused]);
 
-  const onDragStart = useCallback((e) => {
+  const onDragStart = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     if (isFocused) return;
     if (e.button !== 0) return;
     e.preventDefault();
-    const rect = containerRef.current.getBoundingClientRect();
+    const rect = containerRef.current!.getBoundingClientRect();
     dragState.current = {
       offsetX: e.clientX - rect.left,
       offsetY: e.clientY - rect.top
     };
-    const onMove = (ev) => {
+    const onMove = (ev: MouseEvent) => {
       if (!dragState.current) return;
       const x = ev.clientX - dragState.current.offsetX;
       const y = ev.clientY - dragState.current.offsetY;
@@ -72,7 +94,7 @@ export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNu
   // in one click, matching the way Processing's own Run button behaves.
   if (!isOpen) return null;
 
-  const wrapperStyle = isFocused
+  const wrapperStyle: CSSProperties = isFocused
     ? {
         // Cinema mode: heavy backdrop blur so whatever's behind the sketch
         // melts away and the canvas feels stage-lit. A soft radial highlight
@@ -179,7 +201,7 @@ export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNu
   );
 }
 
-function titleBtn(c, dark) {
+function titleBtn(c: Theme, dark: boolean): CSSProperties {
   return {
     background: 'transparent',
     border: 'none',
@@ -189,7 +211,7 @@ function titleBtn(c, dark) {
     color: dark ? 'rgba(255,255,255,0.8)' : c.textMuted,
     display: 'flex', alignItems: 'center',
     transition: 'background 0.12s, color 0.12s',
-    ['--hover-color']: dark ? '#fff' : c.text,
-    ['--hover-border']: 'transparent'
+    ['--hover-color' as string]: dark ? '#fff' : c.text,
+    ['--hover-border' as string]: 'transparent'
   };
 }

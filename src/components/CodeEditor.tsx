@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import type { MouseEvent, DragEvent, ChangeEvent, CSSProperties } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { java } from '@codemirror/lang-java';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -6,10 +7,33 @@ import { tags as T } from '@lezer/highlight';
 import { EditorView } from '@codemirror/view';
 import { sectionIcons } from '../sketches';
 import Icon, { PdeIcon } from './Icon';
+import type { Theme, Translations, UserNodes } from '../types';
+
+interface CodeEditorProps {
+  t: Translations;
+  c: Theme;
+  code: string;
+  onCodeChange: (value: string) => void;
+  fontSize: number;
+  tabs: string[];
+  activeId: string | null;
+  tabLabelFor: (id: string) => string;
+  userNodes: UserNodes;
+  onFocusTab: (id: string) => void;
+  onCloseTab: (id: string) => void;
+  onReorderTab?: (draggedId: string, targetId: string) => void;
+  onRun: () => void;
+  onStop: () => void;
+  stopped: boolean;
+  onReset: () => void;
+  onDownload: () => void;
+  onUpload: (e: ChangeEvent<HTMLInputElement>) => void;
+  error?: string | null;
+}
 
 // Custom highlight palette pulled from the design tokens (t.sk/sb/ss/...).
 // Built per-theme so dark/light both resolve against the same token names.
-function buildHighlightStyle(c) {
+function buildHighlightStyle(c: Theme): HighlightStyle {
   return HighlightStyle.define([
     { tag: [T.keyword, T.modifier, T.controlKeyword, T.operatorKeyword], color: c.sk, fontWeight: '500' },
     { tag: [T.string, T.special(T.string)], color: c.ss },
@@ -31,10 +55,10 @@ export default function CodeEditor({
   onFocusTab, onCloseTab, onReorderTab,
   onRun, onStop, stopped, onReset, onDownload, onUpload,
   error
-}) {
-  const fileInputRef = useRef(null);
-  const [draggedTab, setDraggedTab] = useState(null);
-  const [dragOverTab, setDragOverTab] = useState(null);
+}: CodeEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [draggedTab, setDraggedTab] = useState<string | null>(null);
+  const [dragOverTab, setDragOverTab] = useState<string | null>(null);
 
   const hasActive = !!activeId;
 
@@ -116,31 +140,31 @@ export default function CodeEditor({
             ? (isUserPde
                 ? <PdeIcon size={13} />
                 : <Icon name="file-text" size={13} />)
-            : (sectionIcons[id] || null);
+            : ((sectionIcons as Record<string, string | undefined>)[id] || null);
           const isDragOver = dragOverTab === id && draggedTab && draggedTab !== id;
 
           return (
             <div
               key={id}
               onClick={() => onFocusTab(id)}
-              onAuxClick={(e) => { if (e.button === 1) { e.preventDefault(); onCloseTab(id); } }}
+              onAuxClick={(e: MouseEvent<HTMLDivElement>) => { if (e.button === 1) { e.preventDefault(); onCloseTab(id); } }}
               draggable
-              onDragStart={(e) => {
+              onDragStart={(e: DragEvent<HTMLDivElement>) => {
                 e.dataTransfer.effectAllowed = 'move';
                 try { e.dataTransfer.setData('text/plain', id); } catch { /* ignore */ }
                 setDraggedTab(id);
               }}
-              onDragOver={(e) => {
+              onDragOver={(e: DragEvent<HTMLDivElement>) => {
                 if (!draggedTab || draggedTab === id) return;
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
                 if (dragOverTab !== id) setDragOverTab(id);
               }}
-              onDragLeave={(e) => {
-                if (e.currentTarget.contains(e.relatedTarget)) return;
+              onDragLeave={(e: DragEvent<HTMLDivElement>) => {
+                if (e.currentTarget.contains(e.relatedTarget as Node)) return;
                 if (dragOverTab === id) setDragOverTab(null);
               }}
-              onDrop={(e) => {
+              onDrop={(e: DragEvent<HTMLDivElement>) => {
                 e.preventDefault();
                 if (draggedTab && draggedTab !== id && onReorderTab) {
                   onReorderTab(draggedTab, id);
@@ -160,8 +184,8 @@ export default function CodeEditor({
                 borderLeft: isDragOver ? `2px solid ${c.accent}` : '2px solid transparent',
                 opacity: draggedTab === id ? 0.5 : 1,
                 transition: 'background 0.12s',
-                ['--hover-bg']: c.tabHover
-              }}
+                ['--hover-bg' as string]: c.tabHover
+              } as CSSProperties}
             >
               <span aria-hidden="true" style={{
                 fontSize: 13, display: 'inline-flex', alignItems: 'center',
@@ -175,7 +199,7 @@ export default function CodeEditor({
               }}>{label}</span>
               <button
                 className="editor-tab-close"
-                onClick={(e) => { e.stopPropagation(); onCloseTab(id); }}
+                onClick={(e: MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onCloseTab(id); }}
                 aria-label={`Close ${label}`}
                 title="Close (Ctrl+W)"
                 style={{
@@ -290,8 +314,8 @@ export default function CodeEditor({
             padding: '7px 14px', borderRadius: 7,
             fontSize: 13, fontWeight: 500,
             fontFamily: 'Inter, sans-serif', transition: 'all 0.15s',
-            ['--hover-border']: c.accentBorder
-          }}>
+            ['--hover-border' as string]: c.accentBorder
+          } as CSSProperties}>
             <Icon name="refresh" size={13} />
             {t.reset}
           </button>
@@ -317,35 +341,35 @@ export default function CodeEditor({
   );
 }
 
-function iconBtnStyle(c) {
+function iconBtnStyle(c: Theme): CSSProperties {
   return {
     background: c.resetBg, border: `1px solid ${c.resetBorder}`,
     borderRadius: 6, cursor: 'pointer',
     padding: '6px 9px', color: c.textMuted,
     display: 'flex', alignItems: 'center',
     transition: 'all 0.15s',
-    ['--hover-color']: c.accent,
-    ['--hover-border']: c.accentBorder
-  };
+    ['--hover-color' as string]: c.accent,
+    ['--hover-border' as string]: c.accentBorder
+  } as CSSProperties;
 }
 
 // Flat icon-only Run / Stop buttons that live in the editor's tab strip — same
 // vibe as VS Code's run-this-file caret in the top-right. Resting state is
 // already accent-colored so the action reads at a glance, hover bumps to
 // accentHover and adds a soft accentDim halo for tactile feedback.
-function runIconBtn(c, active) {
+function runIconBtn(c: Theme, active: boolean): CSSProperties {
   return {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     background: 'transparent', border: 'none', cursor: 'pointer',
     width: 28, height: 26, borderRadius: 6,
     color: active ? c.accent : c.textMuted,
     transition: 'background 0.12s, color 0.12s, transform 0.12s',
-    ['--hover-bg']: c.accentDim,
-    ['--hover-color']: c.accentHover
-  };
+    ['--hover-bg' as string]: c.accentDim,
+    ['--hover-color' as string]: c.accentHover
+  } as CSSProperties;
 }
 
-function stopIconBtn(c, disabled) {
+function stopIconBtn(c: Theme, disabled: boolean): CSSProperties {
   return {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     background: 'transparent',
@@ -355,7 +379,7 @@ function stopIconBtn(c, disabled) {
     color: disabled ? c.textDim : c.textMuted,
     opacity: disabled ? 0.5 : 1,
     transition: 'background 0.12s, color 0.12s',
-    ['--hover-bg']: disabled ? 'transparent' : c.accentDim,
-    ['--hover-color']: disabled ? c.textDim : c.accent
-  };
+    ['--hover-bg' as string]: disabled ? 'transparent' : c.accentDim,
+    ['--hover-color' as string]: disabled ? c.textDim : c.accent
+  } as CSSProperties;
 }

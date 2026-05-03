@@ -1,7 +1,7 @@
 // Sketches written in Processing (Java-flavored) syntax.
 // Transpiled to p5.js JS before execution — see transpile.js.
 // Color palette: YTÜ green (#22c55e) and a soft mint (#4ade80) accent.
-export const sketches = {
+export const sketches: Record<string, string> = {
   intro: `void setup() {
   size(320, 240);
   background(18);
@@ -1244,7 +1244,7 @@ export const sectionIds = [
   'finalGame', 'finalArt'
 ];
 
-export const sectionIcons = {
+export const sectionIcons: Record<string, string> = {
   intro: '🎨', fundamentals: '🔷', colors: '🌈', variables: '📊',
   conditionals: '🔀', loops: '🔄', functions: '🧩', interaction: '🖱️',
   keyboard: '⌨️', animation: '🎬', transforms: '🌀', pvector: '↗️', particles: '✨',

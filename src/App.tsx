@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import type { JSX } from 'react';
+import type { Theme, ThemeName, Translations, UserNodes, TabsState, Buffers, UserNode, NodeType, LessonContent, SidebarTab, ModuleDef } from './types';
 import { sketches, sectionIds } from './sketches';
 import { translations, modules } from './i18n';
 import { transpile, P5_HOOKS } from './transpile';
@@ -11,6 +13,12 @@ import RightPanel from './components/RightPanel';
 import ResizeHandle from './components/ResizeHandle';
 import CanvasWindow from './components/CanvasWindow';
 
+declare global {
+  interface Window {
+    p5: unknown;
+  }
+}
+
 const TABS_KEY = 'studio-tabs';
 const SIDEBAR_W_KEY = 'studio-sidebar-w';
 const RIGHT_W_KEY = 'studio-right-w';
@@ -22,7 +30,7 @@ const FONT_SIZE_KEY = 'studio-font-size';
 const USER_FILES_KEY = 'studio-user-files';
 const CANVAS_OPEN_KEY = 'studio-canvas-open';
 
-const DEFAULT_TABS = { ids: [], active: null };
+const DEFAULT_TABS: TabsState = { ids: [], active: null };
 
 // Default content for a freshly-created user sketch.
 // Structure mirrors Processing's own New Sketch template: canvas setup
@@ -42,17 +50,17 @@ void draw() {
 }
 `;
 
-function loadTabs(userNodes) {
+function loadTabs(userNodes: UserNodes | undefined): TabsState {
   try {
     const raw = localStorage.getItem(TABS_KEY);
     if (!raw) return DEFAULT_TABS;
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.ids)) return DEFAULT_TABS;
-    const ids = parsed.ids.filter(id =>
+    const ids: string[] = parsed.ids.filter((id: string) =>
       id in sketches || (userNodes && userNodes[id])
     );
     if (ids.length === 0) return DEFAULT_TABS;
-    const active = typeof parsed.active === 'string' && ids.includes(parsed.active)
+    const active: string | null = typeof parsed.active === 'string' && ids.includes(parsed.active)
       ? parsed.active
       : ids[0];
     return { ids, active };
@@ -61,19 +69,19 @@ function loadTabs(userNodes) {
   }
 }
 
-function loadNum(key, fallback, min, max) {
-  const n = parseFloat(localStorage.getItem(key));
+function loadNum(key: string, fallback: number, min: number, max: number): number {
+  const n = parseFloat(localStorage.getItem(key) || '');
   return Number.isFinite(n) && n >= min && n <= max ? n : fallback;
 }
 
-function loadBool(key, fallback) {
+function loadBool(key: string, fallback: boolean): boolean {
   const v = localStorage.getItem(key);
   if (v === 'true') return true;
   if (v === 'false') return false;
   return fallback;
 }
 
-function loadSet(key) {
+function loadSet(key: string): Set<string> {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return new Set();
@@ -84,19 +92,19 @@ function loadSet(key) {
   }
 }
 
-function loadUserNodes() {
+function loadUserNodes(): UserNodes {
   try {
     const raw = localStorage.getItem(USER_FILES_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return {};
-    return parsed;
+    return parsed as UserNodes;
   } catch {
     return {};
   }
 }
 
-function initialCodeFor(id, userNodes) {
+function initialCodeFor(id: string | null, userNodes: UserNodes | undefined): string {
   if (!id) return '';
   if (userNodes && userNodes[id] && userNodes[id].type === 'file') {
     return userNodes[id].content || '';
@@ -104,17 +112,17 @@ function initialCodeFor(id, userNodes) {
   return sketches[id] || '';
 }
 
-function nextUserName(userNodes, parentId, base) {
+function nextUserName(userNodes: UserNodes, parentId: string | undefined, base: string): string {
   // Returns a name that doesn't collide with siblings in the same folder.
   const siblings = new Set(
     Object.values(userNodes)
-      .filter(n => (n.parentId || 'root') === (parentId || 'root'))
-      .map(n => n.name)
+      .filter((n: UserNode) => (n.parentId || 'root') === (parentId || 'root'))
+      .map((n: UserNode) => n.name)
   );
   if (!siblings.has(base)) return base;
   const m = base.match(/^(.*?)(\.[^.]+)?$/);
-  const stem = m[1];
-  const ext = m[2] || '';
+  const stem = m?.[1] ?? base;
+  const ext = m?.[2] ?? '';
   for (let i = 2; i < 1000; i++) {
     const n = `${stem} ${i}${ext}`;
     if (!siblings.has(n)) return n;
@@ -122,60 +130,63 @@ function nextUserName(userNodes, parentId, base) {
   return `${base}-${Date.now()}`;
 }
 
-function makeId(prefix) {
+function makeId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export default function ProcessingStudio() {
-  const [lang, setLang] = useState(() => localStorage.getItem('lang') || 'en');
-  const [themeName, setThemeName] = useState(() => localStorage.getItem('theme') || 'dark');
-  const [userNodes, setUserNodes] = useState(loadUserNodes);
-  const [tabs, setTabs] = useState(() => loadTabs(loadUserNodes()));
-  const [buffers, setBuffers] = useState(() => {
+export default function ProcessingStudio(): JSX.Element {
+  const [lang, setLang] = useState<string>(() => localStorage.getItem('lang') || 'en');
+  const [themeName, setThemeName] = useState<ThemeName>(() => (localStorage.getItem('theme') || 'dark') as ThemeName);
+  const [userNodes, setUserNodes] = useState<UserNodes>(loadUserNodes);
+  const [tabs, setTabs] = useState<TabsState>(() => loadTabs(loadUserNodes()));
+  const [buffers, setBuffers] = useState<Buffers>(() => {
     const initialNodes = loadUserNodes();
     const initial = loadTabs(initialNodes);
-    const b = {};
+    const b: Buffers = {};
     for (const id of initial.ids) b[id] = initialCodeFor(id, initialNodes);
     return b;
   });
-  const [sidebarW, setSidebarW] = useState(() => loadNum(SIDEBAR_W_KEY, 240, 210, 380));
-  const [rightW, setRightW] = useState(() => loadNum(RIGHT_W_KEY, 360, 260, 540));
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => loadBool(SIDEBAR_COLLAPSED_KEY, false));
-  const [overviewCollapsed, setOverviewCollapsed] = useState(() => loadBool(OVERVIEW_COLLAPSED_KEY, false));
-  const [sidebarTab, setSidebarTab] = useState(() => localStorage.getItem(SIDEBAR_TAB_KEY) || 'courses');
+  const [sidebarW, setSidebarW] = useState<number>(() => loadNum(SIDEBAR_W_KEY, 240, 210, 380));
+  const [rightW, setRightW] = useState<number>(() => loadNum(RIGHT_W_KEY, 360, 260, 540));
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => loadBool(SIDEBAR_COLLAPSED_KEY, false));
+  const [overviewCollapsed, setOverviewCollapsed] = useState<boolean>(() => loadBool(OVERVIEW_COLLAPSED_KEY, false));
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>(() => (localStorage.getItem(SIDEBAR_TAB_KEY) || 'courses') as SidebarTab);
   // Font size is persisted but there's no UI to change it yet — hence no setter.
-  const [fontSize] = useState(() => loadNum(FONT_SIZE_KEY, 13, 11, 20));
-  const [visited, setVisited] = useState(loadSet(VISITED_KEY));
-  const [error, setError] = useState(null);
-  const [canvasOpen, setCanvasOpen] = useState(() => loadBool(CANVAS_OPEN_KEY, true));
+  const [fontSize] = useState<number>(() => loadNum(FONT_SIZE_KEY, 13, 11, 20));
+  const [visited, setVisited] = useState<Set<string>>(loadSet(VISITED_KEY));
+  const [error, setError] = useState<string | null>(null);
+  const [canvasOpen, setCanvasOpen] = useState<boolean>(() => loadBool(CANVAS_OPEN_KEY, true));
   // When true, the auto-run effect leaves the sketch alone — used by the Stop
   // button so a sketch the user paused doesn't restart on every keystroke.
-  const [stopped, setStopped] = useState(false);
+  const [stopped, setStopped] = useState<boolean>(false);
 
-  const canvasRef = useRef(null);
-  const p5Instance = useRef(null);
-  const runTimerRef = useRef(null);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  const p5Instance = useRef<unknown>(null);
+  const runTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const t = translations[lang];
-  const c = themes[themeName];
-  const activeId = tabs.active;
+  const t: Translations = translations[lang];
+  const c: Theme = themes[themeName];
+  const activeId: string | null = tabs.active;
   const hasActive = !!activeId;
-  const code = hasActive ? (buffers[activeId] ?? initialCodeFor(activeId, userNodes)) : '';
-  const isUserFile = hasActive && !!userNodes[activeId];
+  const code: string = hasActive && activeId ? (buffers[activeId] ?? initialCodeFor(activeId, userNodes)) : '';
+  const isUserFile = hasActive && activeId ? !!userNodes[activeId] : false;
   const isLesson = hasActive && !isUserFile;
 
-  const orderedIds = useMemo(() => sectionIds, []);
+  const orderedIds = useMemo<string[]>(() => sectionIds, []);
 
-  const currentModule = useMemo(
-    () => hasActive ? modules.find(m => m.sectionIds.includes(activeId)) : null,
-    [activeId, hasActive]
-  );
+  const currentModule = useMemo<ModuleDef | undefined>(() => {
+    if (!hasActive || !activeId) return undefined;
+    return modules.find(m => m.sectionIds.includes(activeId));
+  }, [activeId, hasActive]);
+
   const moduleIndex = modules.findIndex(m => m.id === currentModule?.id);
-  const sectionNum = useMemo(() => {
-    if (!currentModule || !isLesson) return '';
+
+  const sectionNum = useMemo<string>(() => {
+    if (!currentModule || !isLesson || !activeId) return '';
     return `${moduleIndex + 1}.${currentModule.sectionIds.indexOf(activeId) + 1}`;
   }, [currentModule, moduleIndex, activeId, isLesson]);
-  const moduleLabel = useMemo(() => {
+
+  const moduleLabel = useMemo<string>(() => {
     if (isUserFile) return 'MY FILES';
     if (!currentModule) return '';
     return `${t.moduleWord} ${moduleIndex + 1} · ${t.modules[currentModule.id]}`;
@@ -183,8 +194,8 @@ export default function ProcessingStudio() {
 
   // Build a synthetic "lesson" payload for the overview panel. For user files
   // we fall back to a minimal blurb since there's no curriculum copy.
-  const lesson = useMemo(() => {
-    if (!hasActive) return null;
+  const lesson = useMemo<(LessonContent & { id: string }) | null>(() => {
+    if (!hasActive || !activeId) return null;
     if (isUserFile) {
       return {
         id: activeId,
@@ -200,8 +211,8 @@ export default function ProcessingStudio() {
     return { ...t.lessons[activeId], id: activeId };
   }, [activeId, hasActive, isUserFile, t]);
 
-  const sectionTitle = useMemo(() => {
-    if (!hasActive) return '';
+  const sectionTitle = useMemo<string>(() => {
+    if (!hasActive || !activeId) return '';
     if (isUserFile) return userNodes[activeId].name;
     return t.sections[activeId];
   }, [activeId, hasActive, isUserFile, userNodes, t]);
@@ -230,7 +241,7 @@ export default function ProcessingStudio() {
   // NOTE: visited is user-driven now — no auto-mark on tab switch.
   // Users click the status dot in the sidebar to tick a lesson off.
 
-  const openTab = useCallback((id) => {
+  const openTab = useCallback((id: string): void => {
     setTabs(prev => ({
       ids: prev.ids.includes(id) ? prev.ids : [...prev.ids, id],
       active: id
@@ -238,11 +249,11 @@ export default function ProcessingStudio() {
     setBuffers(prev => id in prev ? prev : { ...prev, [id]: initialCodeFor(id, userNodes) });
   }, [userNodes]);
 
-  const focusTab = useCallback((id) => {
+  const focusTab = useCallback((id: string): void => {
     setTabs(prev => prev.active === id ? prev : { ...prev, active: id });
   }, []);
 
-  const closeTab = useCallback((id) => {
+  const closeTab = useCallback((id: string): void => {
     setTabs(prev => {
       const idx = prev.ids.indexOf(id);
       if (idx === -1) return prev;
@@ -259,7 +270,7 @@ export default function ProcessingStudio() {
     });
   }, []);
 
-  const reorderTabs = useCallback((fromId, toId) => {
+  const reorderTabs = useCallback((fromId: string, toId: string): void => {
     setTabs(prev => {
       const from = prev.ids.indexOf(fromId);
       const to = prev.ids.indexOf(toId);
@@ -271,7 +282,7 @@ export default function ProcessingStudio() {
     });
   }, []);
 
-  const toggleDone = useCallback((id) => {
+  const toggleDone = useCallback((id: string): void => {
     setVisited(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
@@ -289,7 +300,7 @@ export default function ProcessingStudio() {
   // Processing IDE stores sketches: a folder + a .pde file inside sharing the
   // folder's name. Creating one in a single click is the expected UX and also
   // makes room for a `data/` subfolder per Processing conventions.
-  const createUserNode = useCallback((parentId, type, rawName) => {
+  const createUserNode = useCallback((parentId: string | null, type: NodeType | 'sketch', rawName: string): void => {
     const name = (rawName || '').trim();
     if (!name) return;
     const parent = parentId || 'root';
@@ -336,17 +347,17 @@ export default function ProcessingStudio() {
     }
   }, [userNodes]);
 
-  const deleteUserNode = useCallback((id) => {
+  const deleteUserNode = useCallback((id: string): void => {
     const node = userNodes[id];
     if (!node) return;
 
     // Collect descendants (BFS) so we drop child files from tabs/buffers too.
-    const toDelete = new Set([id]);
+    const toDelete = new Set<string>([id]);
     let changed = true;
     while (changed) {
       changed = false;
       for (const n of Object.values(userNodes)) {
-        if (toDelete.has(n.parentId) && !toDelete.has(n.id)) {
+        if (n.parentId != null && toDelete.has(n.parentId) && !toDelete.has(n.id)) {
           toDelete.add(n.id);
           changed = true;
         }
@@ -363,7 +374,7 @@ export default function ProcessingStudio() {
     setTabs(prev => {
       const ids = prev.ids.filter(x => !toDelete.has(x));
       if (ids.length === 0) return DEFAULT_TABS;
-      const active = toDelete.has(prev.active)
+      const active = prev.active != null && toDelete.has(prev.active)
         ? ids[ids.length - 1]
         : prev.active;
       return { ids, active };
@@ -375,7 +386,7 @@ export default function ProcessingStudio() {
     });
   }, [userNodes]);
 
-  const moveUserNode = useCallback((id, newParentId) => {
+  const moveUserNode = useCallback((id: string, newParentId: string | null): void => {
     const node = userNodes[id];
     if (!node) return;
     const targetParent = newParentId || 'root';
@@ -383,12 +394,12 @@ export default function ProcessingStudio() {
 
     // Guard: can't move a folder into itself or a descendant (would orphan the tree).
     if (node.type === 'folder') {
-      const descendants = new Set([id]);
+      const descendants = new Set<string>([id]);
       let grew = true;
       while (grew) {
         grew = false;
         for (const n of Object.values(userNodes)) {
-          if (descendants.has(n.parentId) && !descendants.has(n.id)) {
+          if (n.parentId != null && descendants.has(n.parentId) && !descendants.has(n.id)) {
             descendants.add(n.id);
             grew = true;
           }
@@ -416,7 +427,7 @@ export default function ProcessingStudio() {
     }));
   }, [userNodes]);
 
-  const renameUserNode = useCallback((id, rawName) => {
+  const renameUserNode = useCallback((id: string, rawName: string): void => {
     const node = userNodes[id];
     if (!node) return;
     const name = (rawName || '').trim();
@@ -436,7 +447,7 @@ export default function ProcessingStudio() {
     // Sketch-folder convention: if you rename a folder, any child .pde that
     // shared the folder's old name should follow along. This keeps the
     // Processing "folder == sketch" identity intact.
-    let extraUpdates = {};
+    const extraUpdates: Record<string, UserNode> = {};
     if (node.type === 'folder') {
       const oldPde = `${node.name}.pde`;
       for (const child of Object.values(userNodes)) {
@@ -464,7 +475,7 @@ export default function ProcessingStudio() {
     }));
   }, [userNodes]);
 
-  const onCodeChange = useCallback((v) => {
+  const onCodeChange = useCallback((v: string): void => {
     if (!activeId) return;
     setBuffers(prev => ({ ...prev, [activeId]: v }));
     if (userNodes[activeId]) {
@@ -475,10 +486,10 @@ export default function ProcessingStudio() {
     }
   }, [activeId, userNodes]);
 
-  const runSketch = useCallback(() => {
+  const runSketch = useCallback((): void => {
     setError(null);
     if (p5Instance.current) {
-      p5Instance.current.remove();
+      (p5Instance.current as { remove(): void }).remove();
       p5Instance.current = null;
     }
     // Skip when there's nothing to draw or the preview window is closed —
@@ -493,22 +504,22 @@ export default function ProcessingStudio() {
           `p.${h} = function(`
         );
       }
-      p5Instance.current = new window.p5((p) => {
+      p5Instance.current = new (window.p5 as new (...args: unknown[]) => unknown)((p: unknown) => {
         new Function('p', `with (p) { ${wrapped} }`)(p);
       }, canvasRef.current);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Sketch error:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     }
   }, [code, hasActive, canvasOpen]);
 
   // User pressed the Stop button — tear down the active sketch, close the
   // preview window, and pause the auto-run loop so further code edits don't
   // silently restart it. Run reopens both in one click.
-  const stopSketch = useCallback(() => {
+  const stopSketch = useCallback((): void => {
     if (runTimerRef.current) clearTimeout(runTimerRef.current);
     if (p5Instance.current) {
-      p5Instance.current.remove();
+      (p5Instance.current as { remove(): void }).remove();
       p5Instance.current = null;
     }
     setStopped(true);
@@ -518,7 +529,7 @@ export default function ProcessingStudio() {
   // User pressed the Run button — re-arm auto-run and make sure the preview
   // window is visible. The actual p5 instantiation happens inside the
   // auto-run effect below, kicked off by `stopped` flipping back to false.
-  const startSketch = useCallback(() => {
+  const startSketch = useCallback((): void => {
     setStopped(false);
     if (!canvasOpen) setCanvasOpen(true);
     else runSketch();
@@ -528,15 +539,21 @@ export default function ProcessingStudio() {
     if (runTimerRef.current) clearTimeout(runTimerRef.current);
     if (stopped) return;
     runTimerRef.current = setTimeout(runSketch, 150);
-    return () => clearTimeout(runTimerRef.current);
+    return () => {
+      if (runTimerRef.current) clearTimeout(runTimerRef.current);
+    };
   }, [runSketch, stopped]);
 
-  useEffect(() => () => { if (p5Instance.current) p5Instance.current.remove(); }, []);
+  useEffect(() => () => {
+    if (p5Instance.current) {
+      (p5Instance.current as { remove(): void }).remove();
+    }
+  }, []);
 
   // Ctrl/Cmd + W closes the active tab. Ctrl/Cmd + R re-runs the sketch
   // (matches Processing's own keyboard shortcut).
   useEffect(() => {
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey;
       if (mod && (e.key === 'w' || e.key === 'W')) {
         if (!tabs.active) return;
@@ -552,8 +569,8 @@ export default function ProcessingStudio() {
     return () => window.removeEventListener('keydown', onKey);
   }, [tabs.active, closeTab, hasActive, startSketch]);
 
-  const resetCurrent = () => {
-    if (!hasActive) return;
+  const resetCurrent = (): void => {
+    if (!hasActive || !activeId) return;
     if (isUserFile) {
       // Reset a user file back to the blank template.
       setBuffers(prev => ({ ...prev, [activeId]: BLANK_SKETCH }));
@@ -566,9 +583,9 @@ export default function ProcessingStudio() {
     }
   };
 
-  const downloadSketch = () => {
-    if (!hasActive) return;
-    let slug = activeId || 'sketch';
+  const downloadSketch = (): void => {
+    if (!hasActive || !activeId) return;
+    let slug = activeId;
     if (isUserFile) slug = userNodes[activeId].name.replace(/\.[^.]+$/, '');
     const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -581,8 +598,8 @@ export default function ProcessingStudio() {
     URL.revokeObjectURL(url);
   };
 
-  const uploadSketch = (e) => {
-    const file = e.target.files && e.target.files[0];
+  const uploadSketch = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
@@ -606,12 +623,12 @@ export default function ProcessingStudio() {
     e.target.value = '';
   };
 
-  const gotoRelative = useCallback((delta) => {
+  const gotoRelative = useCallback((delta: number): void => {
     if (!hasActive || isUserFile) {
       openTab(orderedIds[0]);
       return;
     }
-    const idx = orderedIds.indexOf(activeId);
+    const idx = orderedIds.indexOf(activeId!);
     if (idx === -1) {
       openTab(orderedIds[0]);
       return;
@@ -620,14 +637,14 @@ export default function ProcessingStudio() {
     openTab(next);
   }, [hasActive, isUserFile, activeId, orderedIds, openTab]);
 
-  const tabLabelFor = (id) => {
+  const tabLabelFor = (id: string): string => {
     if (userNodes[id]) return displayFileName(userNodes[id].name);
     return t.sections[id] || id;
   };
 
   // Title shown in the floating preview window's titlebar — match Processing's
   // own window naming (filename.pde, or the lesson-derived sketch slug).
-  const canvasTitle = !hasActive
+  const canvasTitle = !hasActive || !activeId
     ? 'Preview'
     : isUserFile
       ? userNodes[activeId].name
@@ -641,8 +658,8 @@ export default function ProcessingStudio() {
       fontFamily: 'Inter, sans-serif'
     }}>
       <Header
-        theme={themeName} setTheme={setThemeName}
-        lang={lang} setLang={setLang}
+        theme={themeName} setTheme={setThemeName as React.Dispatch<React.SetStateAction<string>>}
+        lang={lang} setLang={setLang as React.Dispatch<React.SetStateAction<string>>}
         t={t} c={c}
       />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
@@ -667,7 +684,7 @@ export default function ProcessingStudio() {
         {!sidebarCollapsed && (
           <ResizeHandle
             direction="vertical" t={c}
-            onDrag={(delta) => setSidebarW(w => Math.max(210, Math.min(380, w + delta)))}
+            onDrag={(delta: number) => setSidebarW((w: number) => Math.max(210, Math.min(380, w + delta)))}
           />
         )}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
@@ -690,7 +707,7 @@ export default function ProcessingStudio() {
         {!overviewCollapsed && (
           <ResizeHandle
             direction="vertical" t={c}
-            onDrag={(delta) => setRightW(w => Math.max(260, Math.min(540, w - delta)))}
+            onDrag={(delta: number) => setRightW((w: number) => Math.max(260, Math.min(540, w - delta)))}
           />
         )}
         <div style={{

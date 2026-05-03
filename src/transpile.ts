@@ -26,7 +26,7 @@ export const P5_HOOKS = [
   'deviceMoved', 'deviceTurned', 'deviceShaken'
 ];
 
-export function transpile(src) {
+export function transpile(src: string): string {
   let out = src;
 
   // 1. Strip access / misc modifiers. Processing rarely uses them, but pasted
@@ -50,7 +50,7 @@ export function transpile(src) {
   // 5. Rewrite classes: Java `ClassName(` constructor → JS `constructor(`.
   //    Non-greedy body match ends at the first newline followed by a
   //    column-zero `}` — standard style in Processing sketches.
-  out = out.replace(/class\s+(\w+)(\s+extends\s+\w+)?\s*\{([\s\S]*?)\n\}/g, (_m, name, ext, body) => {
+  out = out.replace(/class\s+(\w+)(\s+extends\s+\w+)?\s*\{([\s\S]*?)\n\}/g, (_m: string, name: string, ext: string | undefined, body: string) => {
     const ctorRe = new RegExp(`(^|\\n)([ \\t]*)${name}\\s*\\(`, 'g');
     const newBody = body.replace(ctorRe, '$1$2constructor(');
     return `class ${name}${ext || ''} {${newBody}\n}`;
@@ -58,7 +58,7 @@ export function transpile(src) {
 
   // 6. Java array allocation: `new int[n]` → `new Array(n).fill(0)`,
   //    `new String[n]` → `new Array(n)`, etc.
-  out = out.replace(ARRAY_ALLOC, (_m, type, size) => {
+  out = out.replace(ARRAY_ALLOC, (_m: string, type: string, size: string) => {
     const trimmed = size.trim();
     const n = trimmed === '' ? '0' : trimmed;
     if (NUMERIC.has(type)) return `new Array(${n}).fill(0)`;
@@ -82,7 +82,7 @@ export function transpile(src) {
   //    bare-method syntax.
   out = out.replace(
     new RegExp(`(^|\\n)([ \\t]*)(?:${TYPES})(?:\\[\\])*[ \\t]+(\\w+)[ \\t]*\\(`, 'g'),
-    (_m, lead, indent, name) => indent.length === 0
+    (_m: string, lead: string, indent: string, name: string) => indent.length === 0
       ? `${lead}function ${name}(`
       : `${lead}${indent}${name}(`
   );

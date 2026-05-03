@@ -1,7 +1,14 @@
+import type { Theme, Translations, LessonContent } from '../types';
+import type { JSX } from 'react';
 import { sectionIcons } from '../sketches';
 import Icon from './Icon';
 
-function SectionLabel({ label, c }) {
+interface SectionLabelProps {
+  label: string;
+  c: Theme;
+}
+
+function SectionLabel({ label, c }: SectionLabelProps): JSX.Element {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
       <span style={{
@@ -13,7 +20,19 @@ function SectionLabel({ label, c }) {
   );
 }
 
-function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, onCollapse }) {
+type LessonOverview = LessonContent & { id: string };
+
+interface CourseOverviewProps {
+  t: Translations;
+  c: Theme;
+  lesson: LessonOverview;
+  sectionNum: string;
+  sectionTitle: string;
+  moduleLabel: string;
+  onCollapse: () => void;
+}
+
+function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, onCollapse }: CourseOverviewProps): JSX.Element {
   return (
     <div style={{
       background: c.overviewBg,
@@ -51,7 +70,7 @@ function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, o
             padding: '6px 8px', borderRadius: 6, color: c.textMuted,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, minWidth: 30, minHeight: 28,
-            ['--hover-color']: c.text
+            ['--hover-color' as string]: c.text
           }}
         >
           <Icon name="chevron-right" size={14} />
@@ -127,7 +146,14 @@ function CourseOverview({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, o
 
 // Slim 40px-wide rail shown when the overview is collapsed. Mirrors the
 // pattern used by the left Sidebar so the chrome reads as symmetric.
-function CollapsedRail({ c, sectionNum, onExpand, label }) {
+interface CollapsedRailProps {
+  c: Theme;
+  sectionNum: string;
+  onExpand: () => void;
+  label: string;
+}
+
+function CollapsedRail({ c, sectionNum, onExpand, label }: CollapsedRailProps): JSX.Element {
   return (
     <div style={{
       width: 40, height: '100%',
@@ -158,7 +184,7 @@ function CollapsedRail({ c, sectionNum, onExpand, label }) {
           background: 'none', border: 'none', cursor: 'pointer',
           padding: 7, borderRadius: 6, color: c.textMuted,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          ['--hover-color']: c.accent
+          ['--hover-color' as string]: c.accent
         }}
       >
         <Icon name="book-open" size={16} />
@@ -189,7 +215,23 @@ function CollapsedRail({ c, sectionNum, onExpand, label }) {
   );
 }
 
-export default function RightPanel({ t, c, lesson, sectionNum, sectionTitle, moduleLabel, overviewCollapsed, setOverviewCollapsed, showOverview = true, hasActive }) {
+interface RightPanelProps {
+  t: Translations;
+  c: Theme;
+  lesson: LessonOverview | null;
+  sectionNum: string;
+  sectionTitle: string;
+  moduleLabel: string;
+  overviewCollapsed: boolean;
+  setOverviewCollapsed: (collapsed: boolean) => void;
+  showOverview?: boolean;
+  hasActive: boolean;
+}
+
+export default function RightPanel({
+  t, c, lesson, sectionNum, sectionTitle, moduleLabel,
+  overviewCollapsed, setOverviewCollapsed, showOverview = true, hasActive
+}: RightPanelProps): JSX.Element {
   if (overviewCollapsed) {
     return (
       <CollapsedRail
@@ -231,7 +273,7 @@ export default function RightPanel({ t, c, lesson, sectionNum, sectionTitle, mod
               padding: '6px 8px', borderRadius: 6, color: c.textMuted,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, minWidth: 30, minHeight: 28,
-              ['--hover-color']: c.text
+              ['--hover-color' as string]: c.text
             }}
           >
             <Icon name="chevron-right" size={14} />
@@ -262,7 +304,7 @@ export default function RightPanel({ t, c, lesson, sectionNum, sectionTitle, mod
     }}>
       <CourseOverview
         t={t} c={c}
-        lesson={lesson}
+        lesson={lesson!}
         sectionNum={sectionNum}
         sectionTitle={sectionTitle}
         moduleLabel={moduleLabel}
