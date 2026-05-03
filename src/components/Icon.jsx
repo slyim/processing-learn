@@ -107,10 +107,10 @@ const P = {
     </>
   ),
   'play-arrow': (
-    <path d="M8,5.14V19a1,1,0,0,0,1.55.83l11-7a1,1,0,0,0,0-1.66l-11-7A1,1,0,0,0,8,5.14ZM10,7,18.16,12,10,17Z" />
+    <path d="M8 5.6L19.2 12 8 18.4V5.6z" />
   ),
   'square': (
-    <rect x="6" y="6" width="12" height="12" rx="1.5" />
+    <rect x="5" y="5" width="14" height="14" rx="2" />
   ),
   'expand': (
     <>
@@ -192,8 +192,8 @@ export default function Icon({ name, size = 16, title, style, onClick, strokeWid
   );
 }
 
-// Branded orange "P" tile — same silhouette as the Processing IDE's .pde file
-// icon, recolored to the YTÜ Programlama brand orange so it sits with the rest
+// Branded green "P" tile — same silhouette as the Processing IDE's .pde file
+// icon, recolored to the YTÜ Programlama brand green so it sits with the rest
 // of the studio chrome. Hard-coded to the accent so it reads as a Processing
 // file regardless of theme.
 export function PdeIcon({ size = 14, title }) {
@@ -207,7 +207,7 @@ export function PdeIcon({ size = 14, title }) {
       role={title ? 'img' : undefined}
       style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}
     >
-      <rect x="2" y="2" width="20" height="20" rx="4" fill="#f97316" />
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#22c55e" />
       <text
         x="12" y="17"
         textAnchor="middle"

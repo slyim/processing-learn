@@ -1,6 +1,6 @@
 // Sketches written in Processing (Java-flavored) syntax.
 // Transpiled to p5.js JS before execution — see transpile.js.
-// Color palette: YTÜ orange (#ff7a1a) and a soft amber (#ffb347) accent.
+// Color palette: YTÜ green (#22c55e) and a soft mint (#4ade80) accent.
 export const sketches = {
   intro: `void setup() {
   size(320, 240);
@@ -8,15 +8,15 @@ export const sketches = {
 }
 
 void draw() {
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(160, 120, 80);
 }`,
 
   fundamentals: `void setup() {
   size(320, 280);
   background(20);
-  fill(255, 122, 26);
-  stroke(255, 179, 71);
+  fill(34, 197, 94);
+  stroke(74, 222, 128);
   strokeWeight(2);
 }
 
@@ -43,11 +43,11 @@ void draw() {
     line(i, 0, i, 140);
   }
   noStroke();
-  fill(255, 122, 26, 180);
+  fill(34, 197, 94, 180);
   rect(40, 160, 100, 80);
-  fill(255, 179, 71, 180);
+  fill(74, 222, 128, 180);
   rect(100, 180, 100, 80);
-  fill(255, 220, 150, 180);
+  fill(134, 239, 172, 180);
   rect(160, 200, 100, 60);
 }`,
 
@@ -63,7 +63,7 @@ void draw() {
   background(20);
   x = x + speed;
   if (x > 320 + diameter) x = -diameter;
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   noStroke();
   circle(x, 100, diameter);
 }`,
@@ -75,9 +75,9 @@ void draw() {
 void draw() {
   background(20);
   if (mouseX < 160) {
-    fill(255, 179, 71);
+    fill(74, 222, 128);
   } else {
-    fill(255, 122, 26);
+    fill(34, 197, 94);
   }
   noStroke();
   rect(0, 0, width / 2, height);
@@ -103,12 +103,12 @@ void draw() {
     float angle = i * PI / 6;
     float x = 160 + cos(angle) * 80;
     float y = 150 + sin(angle) * 80;
-    fill(255, 122, 26);
+    fill(34, 197, 94);
     circle(x, y, 20);
   }
   for (int r = 5; r < 100; r += 10) {
     noFill();
-    stroke(255, 179, 71, 140);
+    stroke(74, 222, 128, 140);
     circle(160, 150, r * 2);
   }
 }`,
@@ -120,9 +120,9 @@ void draw() {
 }
 
 void draw() {
-  drawStar(80, 130, 40, 5, color(255, 122, 26));
-  drawStar(160, 130, 50, 7, color(255, 179, 71));
-  drawStar(240, 130, 40, 9, color(255, 220, 150));
+  drawStar(80, 130, 40, 5, color(34, 197, 94));
+  drawStar(160, 130, 50, 7, color(74, 222, 128));
+  drawStar(240, 130, 40, 9, color(134, 239, 172));
 }
 
 void drawStar(float cx, float cy, float r, int n, color c) {
@@ -144,10 +144,10 @@ void drawStar(float cx, float cy, float r, int n, color c) {
 
 void draw() {
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(mouseX, mouseY, 30);
   if (mouseIsPressed) {
-    stroke(255, 179, 71);
+    stroke(74, 222, 128);
     strokeWeight(3);
     line(pmouseX, pmouseY, mouseX, mouseY);
   }
@@ -171,7 +171,7 @@ void draw() {
   if (keyIsDown(UP_ARROW)) y -= 3;
   if (keyIsDown(DOWN_ARROW)) y += 3;
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(x, y, 30);
   fill(220);
   textAlign(CENTER);
@@ -187,7 +187,7 @@ void draw() {
   noStroke();
   for (int i = 0; i < 5; i++) {
     float y = 120 + sin(frameCount * 0.05 + i * 0.8) * 50;
-    fill(255, 122, 26, 220 - i * 30);
+    fill(34, 197, 94, 220 - i * 30);
     circle(40 + i * 60, y, 40);
   }
 }`,
@@ -206,11 +206,11 @@ void draw() {
   for (int i = 0; i < 8; i++) {
     push();
     rotate(i * PI / 4);
-    fill(255, 179, 71);
+    fill(74, 222, 128);
     ellipse(0, -50, 30, 80);
     pop();
   }
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(0, 0, 30);
   angle += 0.01;
 }`,
@@ -231,7 +231,7 @@ void draw() {
   if (pos.x < 15 || pos.x > width - 15) vel.x *= -1;
   if (pos.y < 15 || pos.y > height - 15) vel.y *= -1;
 
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   noStroke();
   circle(pos.x, pos.y, 30);
 }`,
@@ -256,7 +256,7 @@ void draw() {
     p.x += p.vx; p.y += p.vy;
     if (p.x < 0 || p.x > 320) p.vx *= -1;
     if (p.y < 0 || p.y > 300) p.vy *= -1;
-    fill(255, 122, 26);
+    fill(34, 197, 94);
     circle(p.x, p.y, p.size);
   }
 }`,
@@ -307,7 +307,7 @@ void draw() {
 }
 
 void draw() {
-  stroke(255, 122, 26);
+  stroke(34, 197, 94);
   strokeWeight(2);
   noFill();
   beginShape();
@@ -316,7 +316,7 @@ void draw() {
     vertex(x, y);
   }
   endShape();
-  stroke(255, 179, 71);
+  stroke(74, 222, 128);
   beginShape();
   for (int x = 0; x < 320; x += 2) {
     float y = 130 + cos(x * 0.05) * 60;
@@ -340,7 +340,7 @@ void draw() {
   if (trail.length > 50) trail.shift();
   noStroke();
   for (int i = 0; i < trail.length; i++) {
-    fill(255, 122, 26, i * 5);
+    fill(34, 197, 94, i * 5);
     circle(trail[i].x, trail[i].y, 10);
   }
   t += 0.01;
@@ -350,7 +350,7 @@ void draw() {
   size(320, 280);
   background(20);
   noLoop();
-  stroke(255, 122, 26);
+  stroke(34, 197, 94);
   strokeWeight(1);
 }
 
@@ -382,10 +382,10 @@ void branch(float len) {
 
 void draw() {
   textAlign(CENTER, CENTER);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textSize(48);
   text('p5.js', 160, 80);
-  fill(255, 179, 71);
+  fill(74, 222, 128);
   textSize(18);
   text('creative coding', 160, 130);
   fill(220);
@@ -430,7 +430,7 @@ void draw() {
   rotateY(frameCount * 0.02);
 
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   box(80);
 }`,
 
@@ -444,7 +444,7 @@ void setup() {
 }
 
 void draw() {
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textAlign(CENTER, CENTER);
   textSize(22);
   text(name, 160, 90);
@@ -462,7 +462,7 @@ void draw() {
 }
 
 void draw() {
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textAlign(CENTER, CENTER);
   textSize(15);
 
@@ -486,7 +486,7 @@ void draw() {
 }
 
 void draw() {
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textAlign(CENTER, CENTER);
   textSize(13);
 
@@ -514,7 +514,7 @@ void setup() {
 void draw() {
   background(20);
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   for (int i = 0; i < heights.length; i++) {
     float x = i * 32;
     rect(x + 4, 240 - heights[i], 24, heights[i]);
@@ -560,7 +560,7 @@ void setup() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   for (int i = 0; i < words.length; i++) {
     text(i + ": " + words[i], 30, 50 + i * 22);
   }
@@ -583,7 +583,7 @@ void draw() {
   float d = map(mouseX, 0, width, 10, 120);
   d = constrain(d, 10, 120);
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(width / 2, height / 2, d);
   fill(220);
   textSize(11);
@@ -602,7 +602,7 @@ void setup() {
 void draw() {
   background(20);
   x = lerp(x, targetX, 0.08);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   noStroke();
   circle(x, 100, 30);
   fill(220);
@@ -622,7 +622,7 @@ void mousePressed() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textAlign(LEFT);
   textSize(13);
   text("abs(-7) = " + abs(-7), 30, 50);
@@ -645,7 +645,7 @@ void draw() {
 void draw() {
   noStroke();
   for (int x = 0; x < width; x += 8) {
-    fill(255, 122, 26, x);
+    fill(34, 197, 94, x);
     rect(x, 80, 8, 80);
   }
   fill(220);
@@ -734,7 +734,7 @@ void draw() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   let secs = millis() / 1000.0;
   text(nf(secs, 1, 2) + "s", width / 2, height / 2);
   fill(220);
@@ -750,7 +750,7 @@ void draw() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   let h = hour();
   let m = minute();
   let s = second();
@@ -777,7 +777,7 @@ class Bubble extends Shape {
     this.r = r_;
   }
   void draw() {
-    fill(255, 122, 26);
+    fill(34, 197, 94);
     noStroke();
     circle(this.x, this.y, this.r * 2);
   }
@@ -823,7 +823,7 @@ void setup() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textSize(20);
   textAlign(CENTER, CENTER);
   for (int i = 0; i < animals.length; i++) {
@@ -840,7 +840,7 @@ void draw() {
 
 void draw() {
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   beginShape();
   vertex(80, 60);
   vertex(240, 60);
@@ -858,7 +858,7 @@ void draw() {
 
 void draw() {
   noFill();
-  stroke(255, 122, 26);
+  stroke(34, 197, 94);
   strokeWeight(3);
   bezier(20, 200, 80, 20, 240, 20, 300, 200);
   noStroke();
@@ -882,7 +882,7 @@ void draw() {
 
 void drawCog(float cx, float cy, float r, int teeth) {
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   beginShape();
   for (int i = 0; i < teeth * 2; i++) {
     float a = i * TWO_PI / (teeth * 2);
@@ -915,7 +915,7 @@ void draw() {
     vel.y *= -0.85;
   }
   if (pos.x < 15 || pos.x > width - 15) vel.x *= -1;
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   noStroke();
   circle(pos.x, pos.y, 30);
 }`,
@@ -934,11 +934,11 @@ void draw() {
   v += force;
   v *= 0.95;
   x += v;
-  stroke(255, 179, 71);
+  stroke(74, 222, 128);
   strokeWeight(2);
   line(restX, 100, x, 100);
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(x, 100, 30);
 }
 
@@ -959,7 +959,7 @@ void mousePressed() {
     if (this.pos.y < this.r || this.pos.y > height - this.r) this.vel.y *= -1;
   }
   void show() {
-    fill(255, 122, 26);
+    fill(34, 197, 94);
     noStroke();
     circle(this.pos.x, this.pos.y, this.r * 2);
   }
@@ -1007,7 +1007,7 @@ void draw() {
     let a = n * TWO_PI * 2;
     let dx = cos(a) * 4;
     let dy = sin(a) * 4;
-    fill(255, 122, 26, 100);
+    fill(34, 197, 94, 100);
     circle(x + dx, y + dy, 3);
   }
 }`,
@@ -1027,7 +1027,7 @@ void draw() {
     for (int y = 0; y < cells; y++) {
       float r = noise(x * 0.3, y * 0.3);
       if (r > 0.5) {
-        fill(255, 122, 26, r * 220);
+        fill(34, 197, 94, r * 220);
         rect(x * w + 2, y * h + 2, w - 4, h - 4);
       }
     }
@@ -1050,7 +1050,7 @@ void setup() {
 
 void draw() {
   background(20);
-  stroke(255, 122, 26);
+  stroke(34, 197, 94);
   strokeWeight(1);
   translate(40, 220);
   for (int i = 0; i < state.length; i++) {
@@ -1087,7 +1087,7 @@ void draw() {
   background(20);
   pg.clear();
   pg.noStroke();
-  pg.fill(255, 122, 26, 200);
+  pg.fill(34, 197, 94, 200);
   pg.circle(mouseX, mouseY, 80);
   image(pg, 0, 0);
   fill(220);
@@ -1121,7 +1121,7 @@ void draw() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textSize(14);
   textAlign(CENTER, CENTER);
   text("save('art.png') in real Processing", width / 2, 70);
@@ -1142,7 +1142,7 @@ void setup() {
 
 void draw() {
   background(20);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   textAlign(CENTER, CENTER);
   textSize(16);
   text("frame " + frameNum, width / 2, height / 2);
@@ -1164,14 +1164,14 @@ void setup() {
 void draw() {
   background(20, 60);
   player.x = lerp(player.x, mouseX, 0.2);
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   noStroke();
   rect(player.x - 15, player.y, 30, 8);
 
   if (frameCount % 12 == 0) {
     bullets.push(createVector(random(width), -10));
   }
-  fill(255, 179, 71);
+  fill(74, 222, 128);
   for (let b of bullets) {
     b.y += 4;
     circle(b.x, b.y, 8);

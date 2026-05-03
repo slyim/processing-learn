@@ -37,7 +37,7 @@ void setup() {
 // Runs every frame (~60 times per second).
 void draw() {
   noStroke();
-  fill(255, 122, 26);
+  fill(34, 197, 94);
   circle(mouseX, mouseY, 40);
 }
 `;

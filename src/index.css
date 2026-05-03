@@ -7,7 +7,7 @@ body {
 }
 * { box-sizing: border-box; }
 
-::selection { background: rgba(249, 115, 22, 0.25); }
+::selection { background: rgba(34, 197, 94, 0.25); }
 
 /* Scrollbars */
 *::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -17,7 +17,7 @@ body {
 
 /* Sidebar items — hover shade uses --hover-bg set on the element */
 .sb-item { transition: background 0.15s ease; }
-.sb-item:hover:not([data-active]) { background: var(--hover-bg, rgba(249,115,22,0.08)) !important; }
+.sb-item:hover:not([data-active]) { background: var(--hover-bg, rgba(34,197,94,0.08)) !important; }
 
 .sb-iconbtn { transition: color 0.15s ease, background 0.15s ease; }
 .sb-iconbtn:hover { color: var(--hover-color) !important; }
@@ -25,7 +25,7 @@ body {
 /* Editor tabs */
 .editor-tab { transition: background 0.12s ease; }
 .editor-tab:hover:not([data-active]) { background: var(--hover-bg) !important; }
-.editor-tab-close:hover { opacity: 1 !important; background: rgba(249, 115, 22, 0.18); }
+.editor-tab-close:hover { opacity: 1 !important; background: rgba(34, 197, 94, 0.18); }
 .editor-tab-new:hover { color: var(--hover-color, #e3e1dc); }
 
 /* Action buttons */
@@ -51,8 +51,8 @@ body {
 
 /* Status dot button — subtle focus ring so keyboard users know it's actionable */
 .status-dot-btn { transition: transform 0.12s ease, background 0.12s ease; }
-.status-dot-btn:hover { background: var(--hover-bg, rgba(249,115,22,0.12)); }
-.status-dot-btn:focus-visible { outline: 2px solid var(--focus-ring, #f97316); outline-offset: 2px; }
+.status-dot-btn:hover { background: var(--hover-bg, rgba(34,197,94,0.12)); }
+.status-dot-btn:focus-visible { outline: 2px solid var(--focus-ring, #22c55e); outline-offset: 2px; }
 
 /* CodeMirror — make the scroller fill its container */
 .cm-editor { height: 100%; }
@@ -80,9 +80,9 @@ body {
      point against the blurred backdrop. */
   border-radius: 6px;
   box-shadow:
-    0 0 0 1px rgba(249, 115, 22, 0.20),
+    0 0 0 1px rgba(34, 197, 94, 0.20),
     0 30px 80px rgba(0, 0, 0, 0.55),
-    0 0 120px rgba(249, 115, 22, 0.18);
+    0 0 120px rgba(34, 197, 94, 0.18);
 }
 
 @keyframes cinema-fade-in {

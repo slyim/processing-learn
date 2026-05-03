@@ -78,7 +78,7 @@ export default function CanvasWindow({ c, canvasRef, title, hasActive, sectionNu
         // melts away and the canvas feels stage-lit. A soft radial highlight
         // adds depth without competing with the artwork.
         position: 'fixed', inset: 0, zIndex: 60,
-        background: 'radial-gradient(120% 80% at 50% 35%, rgba(249,115,22,0.18), rgba(0,0,0,0.78) 65%)',
+        background: 'radial-gradient(120% 80% at 50% 35%, rgba(34,197,94,0.18), rgba(0,0,0,0.78) 65%)',
         backdropFilter: 'blur(28px) saturate(160%)',
         WebkitBackdropFilter: 'blur(28px) saturate(160%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',

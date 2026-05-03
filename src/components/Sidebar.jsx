@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { modules } from '../i18n';
-import { sectionIcons } from '../sketches';
 import { displayFileName } from '../lib/fileNames';
 import StatusDot from './StatusDot';
 import Icon, { PdeIcon, DataFolderIcon } from './Icon';
@@ -138,7 +137,6 @@ function CourseList({ t, c, activeId, onOpen, visited, orderedIds, onToggleDone,
                     }}>
                       {`${mi + 1}.${mod.sectionIds.indexOf(id) + 1}`}
                     </span>
-                    <span style={{ marginRight: 4 }}>{sectionIcons[id]}</span>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {t.sections[id]}
                     </span>
