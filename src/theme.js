@@ -23,9 +23,9 @@ export const themes = {
     tabActive: '#131318',
     tabInactive: '#0e0e12',
     tabHover: '#161620',
-    // Syntax tokens (Material / Palenight-ish)
-    sk: '#c792ea', sb: '#ffcb6b', ss: '#c3e88d', sn: '#f78c6c',
-    sc: '#676778', sf: '#82aaff', so: '#89ddff', sd: '#e3e1dc',
+    // Syntax tokens (green-harmonized)
+    sk: '#7ee787', sb: '#fde047', ss: '#86efac', sn: '#fdba74',
+    sc: '#5f6e64', sf: '#7dd3fc', so: '#6ee7b7', sd: '#e3e1dc',
     runBg: '#22c55e', runText: '#fff',
     resetBg: '#1a1a22', resetBorder: '#242430', resetText: '#e3e1dc',
     badge: '#22c55e',
@@ -67,8 +67,8 @@ export const themes = {
     tabActive: '#fdfcf9',
     tabInactive: '#ede9e2',
     tabHover: '#f4f1eb',
-    sk: '#7c3aed', sb: '#b45309', ss: '#15803d', sn: '#b45309',
-    sc: '#9ca3af', sf: '#1d4ed8', so: '#0369a1', sd: '#1c1916',
+    sk: '#15803d', sb: '#a16207', ss: '#16a34a', sn: '#c2410c',
+    sc: '#9ca3af', sf: '#0369a1', so: '#059669', sd: '#1c1916',
     runBg: '#16a34a', runText: '#fff',
     resetBg: '#f4f1eb', resetBorder: '#dddad3', resetText: '#1c1916',
     badge: '#16a34a',
